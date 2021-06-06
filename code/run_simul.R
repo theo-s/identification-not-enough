@@ -32,20 +32,30 @@ plot(x, sapply(x,nonlinear))
 # Run a sim of each DGP --------------------------------------------------------
 source("simul_utils.R")
 
-experiment_1 <- run_sim(p_score = ps,
-                        mu_1 = linear,
-                        n=10000)
-print(experiment_1)
+res <- data.frame(N = NA, Exp = NA, nn1 = NA, ht = NA)
 
-experiment_2 <- run_sim(p_score = ps,
-                        mu_1 = smooth,
-                        n=10000)
-print(experiment_2)
+for (n in c(100, 200, 400, 800, 1600, 3200, 6400)) {
+  experiment_1 <- run_sim(p_score = ps,
+                          mu_1 = linear,
+                          n=n)
 
-experiment_3 <- run_sim(p_score = ps,
-                        mu_1 = nonlinear,
-                        n=10000)
-print(experiment_3)
+  res <- rbind(res, c(n, 1, experiment_1$nn1, experiment_1$ht))
+  print(experiment_1)
+
+  experiment_2 <- run_sim(p_score = ps,
+                          mu_1 = smooth,
+                          n=n)
+  print(experiment_2)
+  res <- rbind(res, c(n, 2, experiment_2$nn1,experiment_2$ht))
+
+  experiment_3 <- run_sim(p_score = ps,
+                          mu_1 = nonlinear,
+                          n=n)
+  print(experiment_3)
+  res <- rbind(res, c(n, 3, experiment_3$nn1,experiment_3$ht))
+}
+
+saveRDS(res[-1,], "res.RDS")
 
 
 
