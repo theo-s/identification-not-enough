@@ -34,6 +34,86 @@ nn_matching <- function(
 
 }
 
+ps_matching <- function(
+  X_train,
+  Tr_train,
+  Y_train,
+  p_scores,
+  M = 1
+) {
+  library(Matching)
+  estimate <- Match(Y = Y_train,
+                    Tr = Tr_train,
+                    X = p_scores,
+                    estimand = "ATE",
+                    ties = FALSE,
+                    M = M)
+  return(estimate$est[1,1])
+
+}
+
+rf <- function(
+  X_train,
+  Tr_train,
+  Y_train,
+  p_scores
+) {
+  library(causalToolbox)
+
+  fit <- S_RF(
+    feat = X_train,
+    tr = Tr_train,
+    yobs = Y_train,
+    verbose = FALSE
+  )
+
+  estimated_cate <- EstimateCate(fit,
+                                 feature_new = X_train,
+                                 aggregation = "oob")
+
+  return(mean(estimated_cate))
+}
+
+lr <- function(
+  X_train,
+  Tr_train,
+  Y_train,
+  p_scores
+) {
+  model <- glm(Y_train ~.,
+               data = data.frame(X_train[which(Tr_train == 1)],
+                                 Y_train[which(Tr_train == 1)]),
+               family = "binomial")
+
+  pred_cate <- predict(model,
+                       newdata = X_train,
+                       type = "response")
+
+  return(mean(pred_cate))
+}
+
+adjusted_ht <- function(
+  X_train,
+  Tr_train,
+  Y_train,
+  p_scores
+) {
+  model <- glm(Y_train ~.,
+               data = data.frame(X_train[which(Tr_train == 1)],
+                                 Y_train[which(Tr_train == 1)],
+                                 ps = 1/p_scores[which(Tr_train == 1)]),
+               family = "binomial")
+
+  pred_out <- predict(model,
+                      newdata = X_train,
+                      type = "link")
+
+  logit <- function(x){return(exp(x)/(1+exp(x)))}
+
+  return(mean(sapply(pred_out, logit)))
+}
+
+
 # run_sim() runs one run of simulations for a given propensity score function
 # and potential outcome function.
 #
@@ -52,8 +132,12 @@ run_sim <- function(
   mu_1,
   n = 500,
   true_p = TRUE,
-  snr = 3
+  snr = 3,
+  seed = 100
 ) {
+
+  # Set seed for cluster sims
+  set.seed(seed)
 
   X <- runif(n)
   p_scores <- sapply(X, p_score)
@@ -61,7 +145,7 @@ run_sim <- function(
   Tr <- ifelse(flips < p_scores,1,0)
   Y <- ifelse(Tr, sapply(X, mu_1),0)
   sd <- sqrt(1/(snr*var(Y)))
-  Y <- Y #+ rnorm(n, sd = sd)
+  Y <- Y #+ rnorm(n, sd = sd) # Noiseless for now
 
   results <- list()
   results[["ht"]] <- try(ht(X_train = X,
@@ -69,11 +153,45 @@ run_sim <- function(
                             Tr_train = Tr,
                             p_scores = p_scores))
 
+  results[["adjusted_ht"]] <- try(adjusted_ht(X_train = X,
+                                              Y_train = Y,
+                                              Tr_train = Tr,
+                                              p_scores = p_scores))
+
   results[["nn1"]] <- try(nn_matching(X_train = X,
                                       Y_train = Y,
                                       Tr_train = Tr,
                                       p_scores = p_scores,
                                       M=1))
+
+  results[["nn3"]] <- try(nn_matching(X_train = X,
+                                      Y_train = Y,
+                                      Tr_train = Tr,
+                                      p_scores = p_scores,
+                                      M=3))
+
+  results[["ps1"]] <- try(ps_matching(X_train = X,
+                                      Y_train = Y,
+                                      Tr_train = Tr,
+                                      p_scores = p_scores,
+                                      M=1))
+
+  results[["ps3"]] <- try(ps_matching(X_train = X,
+                                      Y_train = Y,
+                                      Tr_train = Tr,
+                                      p_scores = p_scores,
+                                      M=3))
+
+  results[["rf"]] <- try(rf(X_train = X,
+                            Y_train = Y,
+                            Tr_train = Tr,
+                            p_scores = p_scores))
+
+  results[["lr"]] <- try(lr(X_train = X,
+                            Y_train = Y,
+                            Tr_train = Tr,
+                            p_scores = p_scores))
+
   return(results)
 
 }
