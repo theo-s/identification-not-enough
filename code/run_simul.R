@@ -1,9 +1,9 @@
 # Define Several potential outcome functions -----------------------------------
-source("simul_utils.R")
+source("code/simul_utils.R")
 
 # When running on the cluster, allow to specify n and seed through arguments ---
 if (!interactive()){
-
+  library(argparse)
   parse_arguments <- ArgumentParser()
   # We can pass an array of different seeds if we want to run different reps
   # on the cluster

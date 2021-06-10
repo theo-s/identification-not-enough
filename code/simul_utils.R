@@ -68,7 +68,7 @@ rf <- function(
   )
 
   estimated_cate <- EstimateCate(fit,
-                                 feature_new = X_train,
+                                 feature_new = data.frame(X_train = X_train),
                                  aggregation = "oob")
 
   return(mean(estimated_cate))
@@ -81,12 +81,12 @@ lr <- function(
   p_scores
 ) {
   model <- glm(Y_train ~.,
-               data = data.frame(X_train[which(Tr_train == 1)],
-                                 Y_train[which(Tr_train == 1)]),
+               data = data.frame(X_train = X_train[Tr_train == 1],
+                                 Y_train = Y_train[Tr_train == 1]),
                family = "binomial")
 
   pred_cate <- predict(model,
-                       newdata = X_train,
+                       newdata = data.frame(X_train = X_train),
                        type = "response")
 
   return(mean(pred_cate))
@@ -99,13 +99,14 @@ adjusted_ht <- function(
   p_scores
 ) {
   model <- glm(Y_train ~.,
-               data = data.frame(X_train[which(Tr_train == 1)],
-                                 Y_train[which(Tr_train == 1)],
-                                 ps = 1/p_scores[which(Tr_train == 1)]),
+               data = data.frame(X_train = X_train[Tr_train == 1],
+                                 Y_train = Y_train[Tr_train == 1],
+                                 ps = 1/p_scores[Tr_train == 1]),
                family = "binomial")
 
   pred_out <- predict(model,
-                      newdata = X_train,
+                      newdata = data.frame(X_train = X_train,
+                                           ps = 1/p_scores),
                       type = "link")
 
   logit <- function(x){return(exp(x)/(1+exp(x)))}
