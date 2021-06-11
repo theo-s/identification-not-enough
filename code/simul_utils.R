@@ -60,6 +60,8 @@ rf <- function(
 ) {
   library(causalToolbox)
 
+  X_train <- data.frame(v1 = X_train)
+
   fit <- S_RF(
     feat = X_train,
     tr = Tr_train,
@@ -67,9 +69,16 @@ rf <- function(
     verbose = FALSE
   )
 
-  estimated_cate <- EstimateCate(fit,
-                                 feature_new = data.frame(X_train = X_train),
-                                 aggregation = "oob")
+  # Estimating the cate here is very awkward, causalToolbox needs to be cleaned up 
+  # to not throw an error when we only have one covariate
+  estimated_cate <- predict(fit@forest, 
+                            cbind(fit@forest@processed_dta$processed_x[,-2], 
+                                  tr = 1), 
+                            aggregation = "oob") - 
+                    predict(fit@forest, 
+                            cbind(fit@forest@processed_dta$processed_x[,-2], 
+                                  tr = 0), 
+                            aggregation = "oob")
 
   return(mean(estimated_cate))
 }

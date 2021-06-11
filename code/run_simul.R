@@ -118,7 +118,7 @@ for (n in c(100, 200, 400, 800, 1600, 3200, 6400)) {
                       experiment_3$rf))
 }
 
-filename <- paste0("results/sim_res_",seed,".RDS")
+filename <- paste0("code/results/sim_res_",seed,".RDS")
 saveRDS(res[-1,], filename)
 
 
