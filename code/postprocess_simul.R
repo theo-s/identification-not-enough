@@ -39,7 +39,7 @@ all_data %>%
   group_by(N,Exp) %>%
   summarise(across(everything(), list(mean))) -> mse_table
 
-write.csv(bias_table, file = "code/MSEtable.csv")
+write.csv(mse_table, file = "code/MSEtable.csv")
 
 
 # Get variance -----------------------------------------------------------------
