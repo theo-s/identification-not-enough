@@ -17,7 +17,8 @@ all_data$TrueATE <- ifelse(all_data$Exp==2,.2058,.25)
 # For some reason RF failed on one run of experiments, exclude these for now ---
 # all_data[rowSums(is.na(all_data)) > 0,]
 all_data %>%
-  filter(!is.na(rf)) -> all_data
+  filter(!is.na(rf)) %>%
+  filter(!is.na(adjusted_ht))-> all_data
 
 
 # Now get Bias -----------------------------------------------------------------
@@ -45,5 +46,7 @@ write.csv(mse_table, file = "code/MSEtable.csv")
 # Get variance -----------------------------------------------------------------
 mse_table[,-c(1,2)] - bias_table[,-c(1,2)]**2 -> var_table
 var_table <- cbind(mse_table[,c(1,2)],var_table)
+
+var_table[rowSums(is.na(var_table)) > 0,]
 
 write.csv(bias_table, file = "code/VARtable.csv")

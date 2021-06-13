@@ -20,16 +20,21 @@ if (!interactive()){
 }
 
 # truncated p score
-ps <- function(x) {
-  return(min(max(x,.01), .99))
+linear_ps <- function(x) {
+  return(.5*min(max(x,.01), .99))
 }
 
 # Linear potential outcome, true ATE = .25
 linear <- function(x) {
-  probs <- .5*x
+  probs <- .5* min(max(x,.01), .99)
   return(rbinom(p = probs,
                 n = length(probs),
                 size = 1))
+}
+
+smooth_ps <- function(x) {
+  probs <- .05*sin(15*x)+.4*x
+  return(probs)
 }
 
 # Smooth sinusoida potential outcome, true ATE ~= .2058
@@ -38,6 +43,17 @@ smooth <- function(x) {
   return(rbinom(p = probs,
                 n = length(probs),
                 size = 1))
+}
+
+nonlinear_ps <- function(x) {
+  # For now we keep the number of bins to be 100 X N depending on whatever N is
+  n_bins <- 100*length(x)
+  bin_width <- 1/n_bins
+  probs <- ifelse(x %% bin_width < (bin_width/2),
+                  .9*x,
+                  .1*x)
+
+  return(probs)
 }
 
 # Highly nonlinear potential outcome, with many local jumps and # bins >> n. True ATE = .25
@@ -67,8 +83,8 @@ res <- data.frame(N = NA,
                   lr = NA,
                   rf = NA)
 
-for (n in c(100, 200, 400, 800, 1600, 3200, 6400)) {
-  experiment_1 <- run_sim(p_score = ps,
+for (n in c(100, 200, 400, 800, 1600, 3200, 6400, 12800, 25600)) {
+  experiment_1 <- run_sim(p_score = linear_ps,
                           mu_1 = linear,
                           n=n,
                           seed=seed)
@@ -85,7 +101,7 @@ for (n in c(100, 200, 400, 800, 1600, 3200, 6400)) {
                       experiment_1$rf))
   print(experiment_1)
 
-  experiment_2 <- run_sim(p_score = ps,
+  experiment_2 <- run_sim(p_score = smooth_ps,
                           mu_1 = smooth,
                           n=n,
                           seed=seed)
@@ -101,7 +117,7 @@ for (n in c(100, 200, 400, 800, 1600, 3200, 6400)) {
                       experiment_2$lr,
                       experiment_2$rf))
 
-  experiment_3 <- run_sim(p_score = ps,
+  experiment_3 <- run_sim(p_score = nonlinear_ps,
                           mu_1 = nonlinear,
                           n=n,
                           seed=seed)
