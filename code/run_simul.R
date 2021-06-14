@@ -91,8 +91,8 @@ res <- data.frame(N = NA,
                   ps_logit1 = NA,
                   lr = NA,
                   rf = NA)
-#, 200, 400, 800, 1600, 3200, 6400, 12800, 25600
-for (n in c(10000)) {
+
+for (n in c(100, 200, 400, 800, 1600, 3200, 6400, 12800, 25600)) {
   experiment_1 <- run_sim(p_score = linear_ps,
                           mu_1 = linear,
                           n=n,
