@@ -49,7 +49,58 @@ ps_matching <- function(
                     ties = FALSE,
                     M = M)
   return(estimate$est[1,1])
+}
 
+ps_matching_rf <- function(
+  X_train,
+  Tr_train,
+  Y_train,
+  p_scores,
+  M = 1
+) {
+  library(Matching)
+  library(Rforestry)
+
+  # Estimate the Pscore using RF
+  fit <- forestry(x = data.frame(X_train),
+                  y = Tr_train)
+
+  ps_estimate <- predict(fit, aggregation = "oob")
+
+  estimate <- Match(Y = Y_train,
+                    Tr = Tr_train,
+                    X = ps_estimate,
+                    estimand = "ATE",
+                    ties = FALSE,
+                    M = M)
+  return(estimate$est[1,1])
+}
+
+ps_matching_logit <- function(
+  X_train,
+  Tr_train,
+  Y_train,
+  p_scores,
+  M = 1
+) {
+  library(Matching)
+
+  fit <- glm(Tr_train ~.,
+             data = data.frame(X_train = X_train,
+                               Tr_train = Tr_train),
+             family = "binomial")
+
+  ps_estimate <- predict(model,
+                         newdata = data.frame(X_train = X_train),
+                         type = "response")
+
+  estimate <- Match(Y = Y_train,
+                    Tr = Tr_train,
+                    X = ps_estimate,
+                    estimand = "ATE",
+                    ties = FALSE,
+                    M = M)
+  return(estimate$est[1,1])
 }
 
 rf <- function(
@@ -69,15 +120,15 @@ rf <- function(
     verbose = FALSE
   )
 
-  # Estimating the cate here is very awkward, causalToolbox needs to be cleaned up 
+  # Estimating the cate here is very awkward, causalToolbox needs to be cleaned up
   # to not throw an error when we only have one covariate
-  estimated_cate <- predict(fit@forest, 
-                            cbind(fit@forest@processed_dta$processed_x[,-2], 
-                                  tr = 1), 
-                            aggregation = "oob") - 
-                    predict(fit@forest, 
-                            cbind(fit@forest@processed_dta$processed_x[,-2], 
-                                  tr = 0), 
+  estimated_cate <- predict(fit@forest,
+                            cbind(fit@forest@processed_dta$processed_x[,-2],
+                                  tr = 1),
+                            aggregation = "oob") -
+                    predict(fit@forest,
+                            cbind(fit@forest@processed_dta$processed_x[,-2],
+                                  tr = 0),
                             aggregation = "oob")
 
   return(mean(estimated_cate))
@@ -122,7 +173,6 @@ adjusted_ht <- function(
 
   return(mean(sapply(pred_out, logit)))
 }
-
 
 # run_sim() runs one run of simulations for a given propensity score function
 # and potential outcome function.

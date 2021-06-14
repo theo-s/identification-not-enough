@@ -21,25 +21,39 @@ if (!interactive()){
 
 # truncated p score
 linear_ps <- function(x) {
-  return(.5*min(max(x,.01), .99))
+  probs <-  .5*x + .1
+  probs <-  min(max(probs,.01), .99)
+
+  logit <- function(x){return(exp(x)/(1+exp(x)))}
+  return(sapply(probs, logit))
 }
 
-# Linear potential outcome, true ATE = .25
+# Linear potential outcome, true ATE = .3
 linear <- function(x) {
-  probs <- .5* min(max(x,.01), .99)
+  probs <-  .5*x + .1
+  probs <-  min(max(probs,.01), .99)
+
+  logit <- function(x){return(exp(x)/(1+exp(x)))}
+  probs <- sapply(probs, logit)
   return(rbinom(p = probs,
                 n = length(probs),
                 size = 1))
 }
 
 smooth_ps <- function(x) {
-  probs <- .05*sin(15*x)+.4*x
+  probs <- .5*sin(15*x)+.4*x+.1
+
+  logit <- function(x){return(exp(x)/(1+exp(x)))}
+  probs <- sapply(probs, logit)
   return(probs)
 }
 
-# Smooth sinusoida potential outcome, true ATE ~= .2058
+# Smooth sinusoida potential outcome, true ATE ~= .35865
 smooth <- function(x) {
-  probs <- .05*sin(15*x)+.4*x
+  probs <- .5*sin(15*x)+.4*x+.1
+
+  logit <- function(x){return(exp(x)/(1+exp(x)))}
+  probs <- sapply(probs, logit)
   return(rbinom(p = probs,
                 n = length(probs),
                 size = 1))
@@ -50,20 +64,20 @@ nonlinear_ps <- function(x) {
   n_bins <- 100*length(x)
   bin_width <- 1/n_bins
   probs <- ifelse(x %% bin_width < (bin_width/2),
-                  .9*x,
-                  .1*x)
+                  .9,
+                  .1)
 
   return(probs)
 }
 
-# Highly nonlinear potential outcome, with many local jumps and # bins >> n. True ATE = .25
+# Highly nonlinear potential outcome, with many local jumps and # bins >> n. True ATE = .5
 nonlinear <- function(x) {
   # For now we keep the number of bins to be 100 X N depending on whatever N is
   n_bins <- 100*length(x)
   bin_width <- 1/n_bins
   probs <- ifelse(x %% bin_width < (bin_width/2),
-                  .9*x,
-                  .1*x)
+                  .9,
+                  .1)
 
   return(rbinom(p = probs,
                 n = length(probs),

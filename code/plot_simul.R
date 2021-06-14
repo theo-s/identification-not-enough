@@ -21,10 +21,10 @@ abs(bias_table) %>%
                                                        "adjusted_ht_1" = "Adjusted Horvitz-Thompson",
                                                        "ht_1" = "Horvitz-Thompson"))) %>%
   ggplot(aes(x = N, y = value, color = Estimator))+
-  geom_line()+
+  geom_line(show.legend = FALSE)+
   scale_color_viridis_d()+
   theme_bw()+
-  labs(y = "|Bias| when estimating ATE", x = "Sample Size")
+  labs(y = "|Bias| when estimating ATE", x = "Sample Size", title = "Experiment 1")
 
 ggsave("code/figures/bias_experiment1.pdf", height = 6, width = 6)
 
@@ -43,10 +43,10 @@ abs(bias_table) %>%
                                                        "adjusted_ht_1" = "Adjusted Horvitz-Thompson",
                                                        "ht_1" = "Horvitz-Thompson"))) %>%
   ggplot(aes(x = N, y = value, color = Estimator))+
-  geom_line()+
+  geom_line(show.legend = FALSE)+
   scale_color_viridis_d()+
   theme_bw()+
-  labs(y = "|Bias| when estimating ATE", x = "Sample Size")
+  labs(y = "|Bias| when estimating ATE", x = "Sample Size", title = "Experiment 2")
 
 ggsave("code/figures/bias_experiment2.pdf", height = 6, width = 6)
 
@@ -68,9 +68,9 @@ abs(bias_table) %>%
   geom_line()+
   scale_color_viridis_d()+
   theme_bw()+
-  labs(y = "|Bias| when estimating ATE", x = "Sample Size")
+  labs(y = "|Bias| when estimating ATE", x = "Sample Size", title = "Experiment 3")
 
-ggsave("code/figures/bias_experiment3.pdf", height = 6, width = 6)
+ggsave("code/figures/bias_experiment3.pdf", height = 6, width = 9)
 
 # Plot sqrt(var) --------------------------------------------------------------------
 mse_table <- read.csv(file = "code/MSEtable.csv")
@@ -92,10 +92,10 @@ rmse_table %>%
                                                        "adjusted_ht_1" = "Adjusted Horvitz-Thompson",
                                                        "ht_1" = "Horvitz-Thompson"))) %>%
   ggplot(aes(x = N, y = value, color = Estimator))+
-  geom_line()+
+  geom_line(show.legend = FALSE)+
   scale_color_viridis_d()+
   theme_bw()+
-  labs(y = "RMSE when estimating ATE", x = "Sample Size")
+  labs(y = "RMSE when estimating ATE", x = "Sample Size", title = "Experiment 1")
 
 ggsave("code/figures/rmse_experiment1.pdf", height = 6, width = 6)
 
@@ -114,10 +114,10 @@ rmse_table %>%
                                                        "adjusted_ht_1" = "Adjusted Horvitz-Thompson",
                                                        "ht_1" = "Horvitz-Thompson"))) %>%
   ggplot(aes(x = N, y = value, color = Estimator))+
-  geom_line()+
+  geom_line(show.legend = FALSE)+
   scale_color_viridis_d()+
   theme_bw()+
-  labs(y = "RMSE when estimating ATE", x = "Sample Size")
+  labs(y = "RMSE when estimating ATE", x = "Sample Size", title = "Experiment 2")
 
 ggsave("code/figures/rmse_experiment2.pdf", height = 6, width = 6)
 
@@ -140,6 +140,6 @@ rmse_table %>%
   geom_line()+
   scale_color_viridis_d()+
   theme_bw()+
-  labs(y = "RMSE when estimating ATE", x = "Sample Size")
+  labs(y = "RMSE when estimating ATE", x = "Sample Size", title = "Experiment 3")
 
-ggsave("code/figures/rmse_experiment3.pdf", height = 6, width = 6)
+ggsave("code/figures/rmse_experiment3.pdf", height = 6, width = 9)
