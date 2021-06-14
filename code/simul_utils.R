@@ -34,7 +34,7 @@ nn_matching <- function(
 
 }
 
-ps_matching <- function(
+ps_matching_true <- function(
   X_train,
   Tr_train,
   Y_train,
@@ -59,13 +59,18 @@ ps_matching_rf <- function(
   M = 1
 ) {
   library(Matching)
-  library(Rforestry)
+  library(ranger)
 
+  X_train = data.frame(v1 = X_train)
+  
   # Estimate the Pscore using RF
-  fit <- forestry(x = data.frame(X_train),
-                  y = Tr_train)
+  fit <- ranger(x = X_train,
+               y = Tr_train)
 
-  ps_estimate <- predict(fit, aggregation = "oob")
+  ps_estimate <- predict(fit, X_train)$predictions
+  ps_estimate <- ifelse(ps_estimate > .99, .99,
+                        ifelse(ps_estimate < .01, .01,
+                               ps_estimate))
 
   estimate <- Match(Y = Y_train,
                     Tr = Tr_train,
@@ -90,9 +95,12 @@ ps_matching_logit <- function(
                                Tr_train = Tr_train),
              family = "binomial")
 
-  ps_estimate <- predict(model,
+  ps_estimate <- predict(fit,
                          newdata = data.frame(X_train = X_train),
                          type = "response")
+  ps_estimate <- ifelse(ps_estimate > .99, .99,
+                        ifelse(ps_estimate < .01, .01,
+                               ps_estimate))
 
   estimate <- Match(Y = Y_train,
                     Tr = Tr_train,
@@ -174,6 +182,46 @@ adjusted_ht <- function(
   return(mean(sapply(pred_out, logit)))
 }
 
+loop_rf <- function(
+  X_train,
+  Tr_train,
+  Y_train,
+  p_scores
+) {
+  library(Rforestry)
+  
+  data_c <- data.frame(v1 = X_train[Tr_train == 0])
+  data_t <- data.frame(v1 = X_train[Tr_train == 1])
+  
+  forest_c <- Rforestry::forestry(x = data_c,
+                                  y = Y_train[Tr_train == 0],
+                                  ntree = 500)
+  
+  forest_t <- Rforestry::forestry(x = data_t,
+                                  y = Y_train[Tr_train == 1],
+                                  ntree = 500)
+  
+  # Use OOB predictions on the correct sets
+  y0_preds_c <- predict(forest_c, data_c, aggregation = "oob")
+  y0_preds_t <- predict(forest_c, data_t)
+  
+  y1_preds_c <- predict(forest_t, data_c)
+  y1_preds_t <- predict(forest_t, data_t, aggregation = "oob")
+  
+  y0_pred <- rep(0, length(Y_train))
+  y0_pred[Tr_train == 1] <- y0_preds_t
+  y0_pred[Tr_train == 0] <- y0_preds_c
+  
+  y1_pred <- rep(0, length(Y_train))
+  y1_pred[Tr_train == 1] <- y1_preds_t
+  y1_pred[Tr_train == 0] <- y1_preds_c
+  
+  m_hat <- (1-p_scores)*y1_pred + p_scores*y0_pred
+  U <- ifelse(Tr_train, 1/p_scores , - 1/(1-p_scores))
+  tau_hat <- (Y_train - m_hat)* U
+  return(mean(tau_hat))
+}
+
 # run_sim() runs one run of simulations for a given propensity score function
 # and potential outcome function.
 #
@@ -201,8 +249,7 @@ run_sim <- function(
 
   X <- runif(n)
   p_scores <- sapply(X, p_score)
-  flips <- runif(n)
-  Tr <- ifelse(flips < p_scores,1,0)
+  Tr <- sapply(X, mu_1)
   Y <- ifelse(Tr, sapply(X, mu_1),0)
   sd <- sqrt(1/(snr*var(Y)))
   Y <- Y #+ rnorm(n, sd = sd) # Noiseless for now
@@ -212,11 +259,16 @@ run_sim <- function(
                             Y_train = Y,
                             Tr_train = Tr,
                             p_scores = p_scores))
-
+  
   results[["adjusted_ht"]] <- try(adjusted_ht(X_train = X,
                                               Y_train = Y,
                                               Tr_train = Tr,
                                               p_scores = p_scores))
+
+  results[["loop_rf"]] <- try(loop_rf(X_train = X,
+                                      Y_train = Y,
+                                      Tr_train = Tr,
+                                      p_scores = p_scores))
 
   results[["nn1"]] <- try(nn_matching(X_train = X,
                                       Y_train = Y,
@@ -224,23 +276,23 @@ run_sim <- function(
                                       p_scores = p_scores,
                                       M=1))
 
-  results[["nn3"]] <- try(nn_matching(X_train = X,
-                                      Y_train = Y,
-                                      Tr_train = Tr,
-                                      p_scores = p_scores,
-                                      M=3))
+  results[["ps1"]] <- try(ps_matching_true(X_train = X,
+                                           Y_train = Y,
+                                           Tr_train = Tr,
+                                           p_scores = p_scores,
+                                           M=1))
 
-  results[["ps1"]] <- try(ps_matching(X_train = X,
-                                      Y_train = Y,
-                                      Tr_train = Tr,
-                                      p_scores = p_scores,
-                                      M=1))
-
-  results[["ps3"]] <- try(ps_matching(X_train = X,
-                                      Y_train = Y,
-                                      Tr_train = Tr,
-                                      p_scores = p_scores,
-                                      M=3))
+  results[["ps_rf1"]] <- try(ps_matching_rf(X_train = X,
+                                            Y_train = Y,
+                                            Tr_train = Tr,
+                                            p_scores = p_scores,
+                                            M=1))
+  
+  results[["ps_logit1"]] <- try(ps_matching_logit(X_train = X,
+                                                  Y_train = Y,
+                                                  Tr_train = Tr,
+                                                  p_scores = p_scores,
+                                                  M=1))
 
   results[["rf"]] <- try(rf(X_train = X,
                             Y_train = Y,

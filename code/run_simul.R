@@ -28,7 +28,7 @@ linear_ps <- function(x) {
   return(sapply(probs, logit))
 }
 
-# Linear potential outcome, true ATE = .3
+# Linear potential outcome, true ATE = .5861
 linear <- function(x) {
   probs <-  .5*x + .1
   probs <-  min(max(probs,.01), .99)
@@ -41,19 +41,13 @@ linear <- function(x) {
 }
 
 smooth_ps <- function(x) {
-  probs <- .5*sin(15*x)+.4*x+.1
-
-  logit <- function(x){return(exp(x)/(1+exp(x)))}
-  probs <- sapply(probs, logit)
+  probs <- .2*sin(15*x)+.4*x+.1
   return(probs)
 }
 
-# Smooth sinusoida potential outcome, true ATE ~= .35865
+# Smooth sinusoida potential outcome, true ATE ~= .32346
 smooth <- function(x) {
-  probs <- .5*sin(15*x)+.4*x+.1
-
-  logit <- function(x){return(exp(x)/(1+exp(x)))}
-  probs <- sapply(probs, logit)
+  probs <- .2*sin(15*x)+.4*x+.1
   return(rbinom(p = probs,
                 n = length(probs),
                 size = 1))
@@ -89,15 +83,16 @@ nonlinear <- function(x) {
 res <- data.frame(N = NA,
                   Exp = NA,
                   nn1 = NA,
-                  nn3 = NA,
                   ht = NA,
                   adjusted_ht = NA,
+                  loop_rf = NA,
                   ps1 = NA,
-                  ps3 = NA,
+                  ps_rf1 = NA,
+                  ps_logit1 = NA,
                   lr = NA,
                   rf = NA)
-
-for (n in c(100, 200, 400, 800, 1600, 3200, 6400, 12800, 25600)) {
+#, 200, 400, 800, 1600, 3200, 6400, 12800, 25600
+for (n in c(10000)) {
   experiment_1 <- run_sim(p_score = linear_ps,
                           mu_1 = linear,
                           n=n,
@@ -106,46 +101,51 @@ for (n in c(100, 200, 400, 800, 1600, 3200, 6400, 12800, 25600)) {
   res <- rbind(res, c(n,
                       1,
                       experiment_1$nn1,
-                      experiment_1$nn3,
                       experiment_1$ht,
                       experiment_1$adjusted_ht,
+                      experiment_1$loop_rf,
                       experiment_1$ps1,
-                      experiment_1$ps3,
+                      experiment_1$ps_rf1,
+                      experiment_1$ps_logit1,
                       experiment_1$lr,
                       experiment_1$rf))
-  print(experiment_1)
+  print(res)
 
   experiment_2 <- run_sim(p_score = smooth_ps,
                           mu_1 = smooth,
                           n=n,
                           seed=seed)
-  print(experiment_2)
+
   res <- rbind(res, c(n,
                       2,
                       experiment_2$nn1,
-                      experiment_2$nn3,
                       experiment_2$ht,
                       experiment_2$adjusted_ht,
+                      experiment_2$loop_rf,
                       experiment_2$ps1,
-                      experiment_2$ps3,
+                      experiment_2$ps_rf1,
+                      experiment_2$ps_logit1,
                       experiment_2$lr,
                       experiment_2$rf))
-
+  print(res)
+  
   experiment_3 <- run_sim(p_score = nonlinear_ps,
                           mu_1 = nonlinear,
                           n=n,
                           seed=seed)
-  print(experiment_3)
+  
   res <- rbind(res, c(n,
                       3,
                       experiment_3$nn1,
-                      experiment_3$nn3,
                       experiment_3$ht,
                       experiment_3$adjusted_ht,
+                      experiment_3$loop_rf,
                       experiment_3$ps1,
-                      experiment_3$ps3,
+                      experiment_3$ps_rf1,
+                      experiment_3$ps_logit1,
                       experiment_3$lr,
                       experiment_3$rf))
+  print(res)
 }
 
 filename <- paste0("code/results/sim_res_",seed,".RDS")
