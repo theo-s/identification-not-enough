@@ -16,9 +16,9 @@ abs(bias_table) %>%
   melt(id.vars = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
-                                                       "ps1_1" = "P Score Matching (True)",
-                                                       "ps_rf1_1" = "P Score Matching (RF)",
-                                                       "ps_logit1_1" = "P Score Matching (Logistic)",
+                                                       "ps1_1" = "PS Matching (True)",
+                                                       "ps_rf1_1" = "PS Matching (RF)",
+                                                       "ps_logit1_1" = "PS Matching (Logistic)",
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
@@ -28,13 +28,14 @@ abs(bias_table) %>%
 abs(bias_table) %>%
   dplyr::select(-adjusted_ht_1) %>%
   filter(Exp == 1) %>%
+  dplyr::filter(N > 100) %>%
   dplyr::select(-Exp, -X) %>%
   melt(id = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
-                                                       "ps1_1" = "P Score Matching (True)",
-                                                       "ps_rf1_1" = "P Score Matching (RF)",
-                                                       "ps_logit1_1" = "P Score Matching (Logistic)",
+                                                       "ps1_1" = "PS Matching (True)",
+                                                       "ps_rf1_1" = "PS Matching (RF)",
+                                                       "ps_logit1_1" = "PS Matching (Logistic)",
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
@@ -49,7 +50,7 @@ abs(bias_table) %>%
                                  "#35B779FF", "#8FD744FF",
                                  "#FDE725FF", "#D2E21BFF"),
     size = 3, force = 3,arrow = arrow(length = unit(0.01, "npc")),
-    direction = "both", nudge_x = 25, nudge_y = 0, point.padding = .92, max.overlaps = Inf
+    direction = "both", nudge_x = 1500, nudge_y = .003, point.padding = .92, max.overlaps = Inf
   )+
   scale_color_viridis_d()+
   theme_bw()+
@@ -62,13 +63,14 @@ ggsave("code/figures/bias_experiment1.pdf", height = 4, width = 4)
 abs(bias_table) %>%
   dplyr::select(-adjusted_ht_1) %>%
   dplyr::filter(Exp == 2) %>%
+  dplyr::filter(N > 100) %>%
   dplyr::select(-X, -Exp) %>%
   melt(id.vars = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
-                                                       "ps1_1" = "P Score Matching (True)",
-                                                       "ps_rf1_1" = "P Score Matching (RF)",
-                                                       "ps_logit1_1" = "P Score Matching (Logistic)",
+                                                       "ps1_1" = "PS Matching (True)",
+                                                       "ps_rf1_1" = "PS Matching (RF)",
+                                                       "ps_logit1_1" = "PS Matching (Logistic)",
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
@@ -77,14 +79,15 @@ abs(bias_table) %>%
 
 abs(bias_table) %>%
   filter(Exp == 2) %>%
+  dplyr::filter(N > 100) %>%
   dplyr::select(-adjusted_ht_1) %>%
   dplyr::select(-Exp, -X) %>%
   melt(id = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
-                                                       "ps1_1" = "P Score Matching (True)",
-                                                       "ps_rf1_1" = "P Score Matching (RF)",
-                                                       "ps_logit1_1" = "P Score Matching (Logistic)",
+                                                       "ps1_1" = "PS Matching (True)",
+                                                       "ps_rf1_1" = "PS Matching (RF)",
+                                                       "ps_logit1_1" = "PS Matching (Logistic)",
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
@@ -98,8 +101,8 @@ abs(bias_table) %>%
                                  "#31688EFF", "#21908CFF",
                                  "#35B779FF", "#8FD744FF",
                                  "#FDE725FF", "#D2E21BFF"),
-    size = 3, force = 3,arrow = arrow(length = unit(0.01, "npc")),
-    direction = "both", nudge_x = 25, nudge_y = 0, point.padding = .92, max.overlaps = Inf
+    size = 3, force = 5,arrow = arrow(length = unit(0.01, "npc")),
+    direction = "both", nudge_x = 750, nudge_y = .003, point.padding = .52, max.overlaps = Inf
   )+
   scale_color_viridis_d()+
   theme_bw()+
@@ -116,9 +119,9 @@ abs(bias_table) %>%
   melt(id.vars = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
-                                                       "ps1_1" = "P Score Matching (True)",
-                                                       "ps_rf1_1" = "P Score Matching (RF)",
-                                                       "ps_logit1_1" = "P Score Matching (Logistic)",
+                                                       "ps1_1" = "PS Matching (True)",
+                                                       "ps_rf1_1" = "PS Matching (RF)",
+                                                       "ps_logit1_1" = "PS Matching (Logistic)",
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
@@ -128,14 +131,15 @@ abs(bias_table) %>%
 
 abs(bias_table) %>%
   filter(Exp == 3) %>%
+  dplyr::filter(N > 100) %>%
   dplyr::select(-adjusted_ht_1) %>%
   dplyr::select(-Exp, -X) %>%
   melt(id = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
-                                                       "ps1_1" = "P Score Matching (True)",
-                                                       "ps_rf1_1" = "P Score Matching (RF)",
-                                                       "ps_logit1_1" = "P Score Matching (Logistic)",
+                                                       "ps1_1" = "PS Matching (True)",
+                                                       "ps_rf1_1" = "PS Matching (RF)",
+                                                       "ps_logit1_1" = "PS Matching (Logistic)",
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
@@ -150,7 +154,7 @@ abs(bias_table) %>%
                                  "#35B779FF", "#8FD744FF",
                                  "#FDE725FF", "#D2E21BFF"),
     size = 3, force = 3,arrow = arrow(length = unit(0.01, "npc")),
-    direction = "both", nudge_x = 25, nudge_y = 0, point.padding = .92, max.overlaps = Inf
+    direction = "both", nudge_x = 1500, nudge_y = .004, point.padding = .92, max.overlaps = Inf
   )+
   scale_color_viridis_d()+
   theme_bw()+
@@ -177,9 +181,9 @@ rmse_table %>%
   melt(id.vars = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
-                                                       "ps1_1" = "P Score Matching (True)",
-                                                       "ps_rf1_1" = "P Score Matching (RF)",
-                                                       "ps_logit1_1" = "P Score Matching (Logistic)",
+                                                       "ps1_1" = "PS Matching (True)",
+                                                       "ps_rf1_1" = "PS Matching (RF)",
+                                                       "ps_logit1_1" = "PS Matching (Logistic)",
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
@@ -188,14 +192,15 @@ rmse_table %>%
 
 rmse_table %>%
   filter(Exp == 1) %>%
+  dplyr::filter(N > 100) %>%
   dplyr::select(-adjusted_ht_1) %>%
   dplyr::select(-Exp, -X) %>%
   melt(id = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
-                                                       "ps1_1" = "P Score Matching (True)",
-                                                       "ps_rf1_1" = "P Score Matching (RF)",
-                                                       "ps_logit1_1" = "P Score Matching (Logistic)",
+                                                       "ps1_1" = "PS Matching (True)",
+                                                       "ps_rf1_1" = "PS Matching (RF)",
+                                                       "ps_logit1_1" = "PS Matching (Logistic)",
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
@@ -210,7 +215,7 @@ rmse_table %>%
                                  "#35B779FF", "#8FD744FF",
                                  "#FDE725FF", "#D2E21BFF"),
     size = 3, force = 3,arrow = arrow(length = unit(0.01, "npc")),
-    direction = "both", nudge_x = 25, nudge_y = 0, point.padding = .92, max.overlaps = Inf
+    direction = "both", nudge_x = 2500, nudge_y = .01, point.padding = .92, max.overlaps = Inf
   )+
   scale_color_viridis_d()+
   theme_bw()+
@@ -227,9 +232,9 @@ rmse_table %>%
   melt(id.vars = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
-                                                       "ps1_1" = "P Score Matching (True)",
-                                                       "ps_rf1_1" = "P Score Matching (RF)",
-                                                       "ps_logit1_1" = "P Score Matching (Logistic)",
+                                                       "ps1_1" = "PS Matching (True)",
+                                                       "ps_rf1_1" = "PS Matching (RF)",
+                                                       "ps_logit1_1" = "PS Matching (Logistic)",
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
@@ -238,14 +243,15 @@ rmse_table %>%
 
 rmse_table %>%
   filter(Exp == 2) %>%
+  dplyr::filter(N > 100) %>%
   dplyr::select(-adjusted_ht_1) %>%
   dplyr::select(-Exp, -X) %>%
   melt(id = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
-                                                       "ps1_1" = "P Score Matching (True)",
-                                                       "ps_rf1_1" = "P Score Matching (RF)",
-                                                       "ps_logit1_1" = "P Score Matching (Logistic)",
+                                                       "ps1_1" = "PS Matching (True)",
+                                                       "ps_rf1_1" = "PS Matching (RF)",
+                                                       "ps_logit1_1" = "PS Matching (Logistic)",
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
@@ -260,7 +266,7 @@ rmse_table %>%
                                  "#35B779FF", "#8FD744FF",
                                  "#FDE725FF", "#D2E21BFF"),
     size = 3, force = 3,arrow = arrow(length = unit(0.01, "npc")),
-    direction = "both", nudge_x = 25, nudge_y = 0, point.padding = .92, max.overlaps = Inf
+    direction = "both", nudge_x = 3000, nudge_y = .01, point.padding = .92, max.overlaps = Inf
   )+
   scale_color_viridis_d()+
   theme_bw()+
@@ -278,9 +284,9 @@ rmse_table %>%
   melt(id.vars = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
-                                                       "ps1_1" = "P Score Matching (True)",
-                                                       "ps_rf1_1" = "P Score Matching (RF)",
-                                                       "ps_logit1_1" = "P Score Matching (Logistic)",
+                                                       "ps1_1" = "PS Matching (True)",
+                                                       "ps_rf1_1" = "PS Matching (RF)",
+                                                       "ps_logit1_1" = "PS Matching (Logistic)",
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
@@ -289,14 +295,15 @@ rmse_table %>%
 
 rmse_table %>%
   filter(Exp == 3) %>%
+  dplyr::filter(N > 100) %>%
   dplyr::select(-adjusted_ht_1) %>%
   dplyr::select(-Exp, -X) %>%
   melt(id = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
-                                                       "ps1_1" = "P Score Matching (True)",
-                                                       "ps_rf1_1" = "P Score Matching (RF)",
-                                                       "ps_logit1_1" = "P Score Matching (Logistic)",
+                                                       "ps1_1" = "PS Matching (True)",
+                                                       "ps_rf1_1" = "PS Matching (RF)",
+                                                       "ps_logit1_1" = "PS Matching (Logistic)",
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
@@ -311,7 +318,7 @@ rmse_table %>%
                                  "#35B779FF", "#8FD744FF",
                                  "#FDE725FF", "#D2E21BFF"),
     size = 3, force = 3,arrow = arrow(length = unit(0.01, "npc")),
-    direction = "both", nudge_x = 25, nudge_y = 0, point.padding = .92, max.overlaps = Inf
+    direction = "both", nudge_x = 4000, nudge_y = 0, point.padding = .52, max.overlaps = Inf
   )+
   scale_color_viridis_d()+
   theme_bw()+
