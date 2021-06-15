@@ -13,11 +13,12 @@ abs(bias_table) %>%
   melt(id = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "Nearest Neighbor Matching (M=1)",
-                                                       "nn3_1" = "Nearest Neighbor Matching (M=3)",
-                                                       "ps1_1" = "Propensity Score Matching (M=1)",
-                                                       "ps3_1" = "Propensity Score Matching (M=3)",
-                                                       "lr_1" = "Logit Regression",
+                                                       "ps1_1" = "Propensity Score Matching (True Propensity Score)",
+                                                       "ps_rf1_1" = "Propensity Score Matching (RF Estimated)",
+                                                       "ps_logit1_1" = "Propensity Score Matching (Logistic Estimated)",
+                                                       "lr_1" = "Logistic Regression",
                                                        "rf_1" = "Random Forest",
+                                                       "loop_rf_1" = "Leave-one-out RF adjusted Horvitz Thompson",
                                                        "adjusted_ht_1" = "Adjusted Horvitz-Thompson",
                                                        "ht_1" = "Horvitz-Thompson"))) %>%
   ggplot(aes(x = N, y = value, color = Estimator))+
@@ -35,11 +36,12 @@ abs(bias_table) %>%
   melt(id = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "Nearest Neighbor Matching (M=1)",
-                                                       "nn3_1" = "Nearest Neighbor Matching (M=3)",
-                                                       "ps1_1" = "Propensity Score Matching (M=1)",
-                                                       "ps3_1" = "Propensity Score Matching (M=3)",
-                                                       "lr_1" = "Logit Regression",
+                                                       "ps1_1" = "Propensity Score Matching (True Propensity Score)",
+                                                       "ps_rf1_1" = "Propensity Score Matching (RF Estimated)",
+                                                       "ps_logit1_1" = "Propensity Score Matching (Logistic Estimated)",
+                                                       "lr_1" = "Logistic Regression",
                                                        "rf_1" = "Random Forest",
+                                                       "loop_rf_1" = "Leave-one-out RF adjusted Horvitz Thompson",
                                                        "adjusted_ht_1" = "Adjusted Horvitz-Thompson",
                                                        "ht_1" = "Horvitz-Thompson"))) %>%
   ggplot(aes(x = N, y = value, color = Estimator))+
@@ -57,11 +59,12 @@ abs(bias_table) %>%
   melt(id = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "Nearest Neighbor Matching (M=1)",
-                                                       "nn3_1" = "Nearest Neighbor Matching (M=3)",
-                                                       "ps1_1" = "Propensity Score Matching (M=1)",
-                                                       "ps3_1" = "Propensity Score Matching (M=3)",
-                                                       "lr_1" = "Logit Regression",
+                                                       "ps1_1" = "Propensity Score Matching (True Propensity Score)",
+                                                       "ps_rf1_1" = "Propensity Score Matching (RF Estimated)",
+                                                       "ps_logit1_1" = "Propensity Score Matching (Logistic Estimated)",
+                                                       "lr_1" = "Logistic Regression",
                                                        "rf_1" = "Random Forest",
+                                                       "loop_rf_1" = "Leave-one-out RF adjusted Horvitz Thompson",
                                                        "adjusted_ht_1" = "Adjusted Horvitz-Thompson",
                                                        "ht_1" = "Horvitz-Thompson"))) %>%
   ggplot(aes(x = N, y = value, color = Estimator))+
@@ -84,11 +87,12 @@ rmse_table %>%
   melt(id = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "Nearest Neighbor Matching (M=1)",
-                                                       "nn3_1" = "Nearest Neighbor Matching (M=3)",
-                                                       "ps1_1" = "Propensity Score Matching (M=1)",
-                                                       "ps3_1" = "Propensity Score Matching (M=3)",
-                                                       "lr_1" = "Logit Regression",
+                                                       "ps1_1" = "Propensity Score Matching (True Propensity Score)",
+                                                       "ps_rf1_1" = "Propensity Score Matching (RF Estimated)",
+                                                       "ps_logit1_1" = "Propensity Score Matching (Logistic Estimated)",
+                                                       "lr_1" = "Logistic Regression",
                                                        "rf_1" = "Random Forest",
+                                                       "loop_rf_1" = "Leave-one-out RF adjusted Horvitz Thompson",
                                                        "adjusted_ht_1" = "Adjusted Horvitz-Thompson",
                                                        "ht_1" = "Horvitz-Thompson"))) %>%
   ggplot(aes(x = N, y = value, color = Estimator))+
@@ -106,11 +110,12 @@ rmse_table %>%
   melt(id = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "Nearest Neighbor Matching (M=1)",
-                                                       "nn3_1" = "Nearest Neighbor Matching (M=3)",
-                                                       "ps1_1" = "Propensity Score Matching (M=1)",
-                                                       "ps3_1" = "Propensity Score Matching (M=3)",
-                                                       "lr_1" = "Logit Regression",
+                                                       "ps1_1" = "Propensity Score Matching (True Propensity Score)",
+                                                       "ps_rf1_1" = "Propensity Score Matching (RF Estimated)",
+                                                       "ps_logit1_1" = "Propensity Score Matching (Logistic Estimated)",
+                                                       "lr_1" = "Logistic Regression",
                                                        "rf_1" = "Random Forest",
+                                                       "loop_rf_1" = "Leave-one-out RF adjusted Horvitz Thompson",
                                                        "adjusted_ht_1" = "Adjusted Horvitz-Thompson",
                                                        "ht_1" = "Horvitz-Thompson"))) %>%
   ggplot(aes(x = N, y = value, color = Estimator))+
@@ -129,11 +134,12 @@ rmse_table %>%
   melt(id = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "Nearest Neighbor Matching (M=1)",
-                                                       "nn3_1" = "Nearest Neighbor Matching (M=3)",
-                                                       "ps1_1" = "Propensity Score Matching (M=1)",
-                                                       "ps3_1" = "Propensity Score Matching (M=3)",
-                                                       "lr_1" = "Logit Regression",
+                                                       "ps1_1" = "Propensity Score Matching (True Propensity Score)",
+                                                       "ps_rf1_1" = "Propensity Score Matching (RF Estimated)",
+                                                       "ps_logit1_1" = "Propensity Score Matching (Logistic Estimated)",
+                                                       "lr_1" = "Logistic Regression",
                                                        "rf_1" = "Random Forest",
+                                                       "loop_rf_1" = "Leave-one-out RF adjusted Horvitz Thompson",
                                                        "adjusted_ht_1" = "Adjusted Horvitz-Thompson",
                                                        "ht_1" = "Horvitz-Thompson"))) %>%
   ggplot(aes(x = N, y = value, color = Estimator))+
