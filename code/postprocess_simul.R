@@ -11,13 +11,15 @@ for (file in dir("code/results")) {
 }
 
 # Add the true average treatment effects for the different experiments ---------
-all_data$TrueATE <- ifelse(all_data$Exp==2,.2058,.25)
+all_data$TrueATE <- ifelse(all_data$Exp==1,.5861,
+                           ifelse(all_data$Exp==2, .32346, .5))
 
 
 # For some reason RF failed on one run of experiments, exclude these for now ---
 # all_data[rowSums(is.na(all_data)) > 0,]
 all_data %>%
   filter(!is.na(rf)) %>%
+  filter(!is.na(loop_rf)) %>%
   filter(!is.na(adjusted_ht))-> all_data
 
 
@@ -47,6 +49,7 @@ write.csv(mse_table, file = "code/MSEtable.csv")
 mse_table[,-c(1,2)] - bias_table[,-c(1,2)]**2 -> var_table
 var_table <- cbind(mse_table[,c(1,2)],var_table)
 
+# See if any are Nan
 var_table[rowSums(is.na(var_table)) > 0,]
 
-write.csv(bias_table, file = "code/VARtable.csv")
+write.csv(var_table, file = "code/VARtable.csv")
