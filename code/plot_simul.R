@@ -49,7 +49,7 @@ abs(bias_table) %>%
                                  "#31688EFF", "#21908CFF",
                                  "#35B779FF", "#8FD744FF",
                                  "#FDE725FF", "#D2E21BFF"),
-    size = 3, force = 3,arrow = arrow(length = unit(0.01, "npc")),
+    size = 2, force = 3,arrow = arrow(length = unit(0.01, "npc")),
     direction = "both", nudge_x = 1500, nudge_y = .003, point.padding = .92, max.overlaps = Inf
   )+
   scale_color_viridis_d()+
@@ -101,7 +101,7 @@ abs(bias_table) %>%
                                  "#31688EFF", "#21908CFF",
                                  "#35B779FF", "#8FD744FF",
                                  "#FDE725FF", "#D2E21BFF"),
-    size = 3, force = 5,arrow = arrow(length = unit(0.01, "npc")),
+    size = 2, force = 5,arrow = arrow(length = unit(0.01, "npc")),
     direction = "both", nudge_x = 750, nudge_y = .003, point.padding = .52, max.overlaps = Inf
   )+
   scale_color_viridis_d()+
@@ -153,7 +153,7 @@ abs(bias_table) %>%
                                  "#31688EFF", "#21908CFF",
                                  "#35B779FF", "#8FD744FF",
                                  "#FDE725FF", "#D2E21BFF"),
-    size = 3, force = 3,arrow = arrow(length = unit(0.01, "npc")),
+    size = 2, force = 3,arrow = arrow(length = unit(0.01, "npc")),
     direction = "both", nudge_x = 1500, nudge_y = .004, point.padding = .92, max.overlaps = Inf
   )+
   scale_color_viridis_d()+
@@ -214,7 +214,7 @@ rmse_table %>%
                                  "#31688EFF", "#21908CFF",
                                  "#35B779FF", "#8FD744FF",
                                  "#FDE725FF", "#D2E21BFF"),
-    size = 3, force = 3,arrow = arrow(length = unit(0.01, "npc")),
+    size = 2, force = 3,arrow = arrow(length = unit(0.01, "npc")),
     direction = "both", nudge_x = 2500, nudge_y = .01, point.padding = .92, max.overlaps = Inf
   )+
   scale_color_viridis_d()+
@@ -265,7 +265,7 @@ rmse_table %>%
                                  "#31688EFF", "#21908CFF",
                                  "#35B779FF", "#8FD744FF",
                                  "#FDE725FF", "#D2E21BFF"),
-    size = 3, force = 3,arrow = arrow(length = unit(0.01, "npc")),
+    size = 2, force = 3,arrow = arrow(length = unit(0.01, "npc")),
     direction = "both", nudge_x = 3000, nudge_y = .01, point.padding = .92, max.overlaps = Inf
   )+
   scale_color_viridis_d()+
@@ -317,7 +317,7 @@ rmse_table %>%
                                  "#31688EFF", "#21908CFF",
                                  "#35B779FF", "#8FD744FF",
                                  "#FDE725FF", "#D2E21BFF"),
-    size = 3, force = 3,arrow = arrow(length = unit(0.01, "npc")),
+    size = 2, force = 3,arrow = arrow(length = unit(0.01, "npc")),
     direction = "both", nudge_x = 4000, nudge_y = 0, point.padding = .52, max.overlaps = Inf
   )+
   scale_color_viridis_d()+
