@@ -8,6 +8,17 @@ library(ggrepel)
 # Plot Bias --------------------------------------------------------------------
 bias_table <- read.csv(file = "code/BIAStable.csv")
 
+# Set linetypes for different estimator styles
+linetypes <- c("NN Matching" = "dotted",
+               "PS Matching (True)" = "solid",
+               "LOO RF " = "solid",
+               "Horvitz-Thompson" = "solid",
+               "PS Matching (RF)" = "dashed",
+               "PS Matching (Logistic)" = "dashed",
+               "Logistic" = "dotted",
+               "RF" = "dotted")
+
+
 # Plot Experiment 1 ------------------------------------------------------------
 abs(bias_table) %>%
   dplyr::select(-adjusted_ht_1) %>%
@@ -25,6 +36,7 @@ abs(bias_table) %>%
                                                        "ht_1" = "Horvitz-Thompson"))) %>%
   dplyr::filter(N == 25600) -> end_values
 
+
 abs(bias_table) %>%
   dplyr::select(-adjusted_ht_1) %>%
   filter(Exp == 1) %>%
@@ -40,8 +52,9 @@ abs(bias_table) %>%
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
                                                        "ht_1" = "Horvitz-Thompson"))) %>%
-  ggplot(aes(x = N, y = value, color = Estimator))+
+  ggplot(aes(x = N, y = value, color = Estimator, linetype = Estimator))+
   geom_line(show.legend = FALSE)+
+  scale_linetype_manual(values = linetypes)+
   xlim(0, 40000) +
   geom_text_repel(
     aes(label = Estimator),
@@ -92,8 +105,9 @@ abs(bias_table) %>%
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
                                                        "ht_1" = "Horvitz-Thompson"))) %>%
-  ggplot(aes(x = N, y = value, color = Estimator))+
+  ggplot(aes(x = N, y = value, color = Estimator, linetype = Estimator))+
   geom_line(show.legend = FALSE)+
+  scale_linetype_manual(values = linetypes)+
   xlim(0, 40000) +
   geom_text_repel(
     aes(label = Estimator),
@@ -144,8 +158,9 @@ abs(bias_table) %>%
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
                                                        "ht_1" = "Horvitz-Thompson"))) %>%
-  ggplot(aes(x = N, y = value, color = Estimator))+
+  ggplot(aes(x = N, y = value, color = Estimator, linetype = Estimator))+
   geom_line(show.legend = FALSE)+
+  scale_linetype_manual(values = linetypes)+
   xlim(0, 40000) +
   geom_text_repel(
     aes(label = Estimator),
@@ -205,8 +220,9 @@ rmse_table %>%
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
                                                        "ht_1" = "Horvitz-Thompson"))) %>%
-  ggplot(aes(x = N, y = value, color = Estimator))+
+  ggplot(aes(x = N, y = value, color = Estimator, linetype = Estimator))+
   geom_line(show.legend = FALSE)+
+  scale_linetype_manual(values = linetypes)+
   xlim(0, 40000) +
   geom_text_repel(
     aes(label = Estimator),
@@ -256,8 +272,9 @@ rmse_table %>%
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
                                                        "ht_1" = "Horvitz-Thompson"))) %>%
-  ggplot(aes(x = N, y = value, color = Estimator))+
+  ggplot(aes(x = N, y = value, color = Estimator, linetype = Estimator))+
   geom_line(show.legend = FALSE)+
+  scale_linetype_manual(values = linetypes)+
   xlim(0, 40000) +
   geom_text_repel(
     aes(label = Estimator),
@@ -308,8 +325,9 @@ rmse_table %>%
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
                                                        "ht_1" = "Horvitz-Thompson"))) %>%
-  ggplot(aes(x = N, y = value, color = Estimator))+
+  ggplot(aes(x = N, y = value, color = Estimator, linetype = Estimator))+
   geom_line(show.legend = FALSE)+
+  scale_linetype_manual(values = linetypes)+
   xlim(0, 40000) +
   geom_text_repel(
     aes(label = Estimator),
