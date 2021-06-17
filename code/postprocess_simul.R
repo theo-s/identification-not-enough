@@ -10,6 +10,9 @@ for (file in dir("code/results")) {
   all_data <- rbind(all_data, data)
 }
 
+all_data %>%
+  filter(N %in% c(1e3,1e4,1e5)) -> all_data
+
 # Add the true average treatment effects for the different experiments ---------
 all_data$TrueATE <- ifelse(all_data$Exp==1,.5861,
                            ifelse(all_data$Exp==2, .32346, .5))

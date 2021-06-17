@@ -9,14 +9,21 @@ library(ggrepel)
 bias_table <- read.csv(file = "code/BIAStable.csv")
 
 # Set linetypes for different estimator styles
-linetypes <- c("NN Matching" = "dotted",
-               "PS Matching (True)" = "solid",
+linetypes <- c("PS Matching (True)" = "solid",
                "LOO RF " = "solid",
                "Horvitz-Thompson" = "solid",
                "PS Matching (RF)" = "dashed",
                "PS Matching (Logistic)" = "dashed",
                "Logistic" = "dotted",
+               "NN Matching" = "dotted",
                "RF" = "dotted")
+
+colors = c("aquamarine", #"#8FD744FF",
+           "darkorange", "deeppink",
+           "brown1",
+           "chartreuse", "deepskyblue",
+           "blue"
+           )
 
 
 # Plot Experiment 1 ------------------------------------------------------------
@@ -34,7 +41,7 @@ abs(bias_table) %>%
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
                                                        "ht_1" = "Horvitz-Thompson"))) %>%
-  dplyr::filter(N == 25600) -> end_values
+  dplyr::filter(N == 1e5) -> end_values
 
 
 abs(bias_table) %>%
@@ -55,12 +62,12 @@ abs(bias_table) %>%
   ggplot(aes(x = N, y = value, color = Estimator, linetype = Estimator))+
   geom_line(show.legend = FALSE)+
   scale_linetype_manual(values = linetypes)+
-  xlim(0, 40000) +
+  xlim(0, 110000) +
   geom_text_repel(
     aes(label = Estimator),
     data = end_values, color = c("#440154FF", "#443A83FF",
-                                 "#31688EFF", "#21908CFF",
-                                 "#35B779FF", "#8FD744FF",
+                                 "#31688EFF", "#1E9B8AFF",
+                                 "#51C56AFF", "#8FD744FF",
                                  "#FDE725FF", "#D2E21BFF"),
     size = 2, force = 3,arrow = arrow(length = unit(0.01, "npc")),
     direction = "both", nudge_x = 1500, nudge_y = .003, point.padding = .92, max.overlaps = Inf
@@ -88,7 +95,7 @@ abs(bias_table) %>%
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
                                                        "ht_1" = "Horvitz-Thompson"))) %>%
-  dplyr::filter(N == 25600) -> end_values
+  dplyr::filter(N == 1e5) -> end_values
 
 abs(bias_table) %>%
   filter(Exp == 2) %>%
@@ -108,12 +115,12 @@ abs(bias_table) %>%
   ggplot(aes(x = N, y = value, color = Estimator, linetype = Estimator))+
   geom_line(show.legend = FALSE)+
   scale_linetype_manual(values = linetypes)+
-  xlim(0, 40000) +
+  xlim(0, 110000) +
   geom_text_repel(
     aes(label = Estimator),
     data = end_values, color = c("#440154FF", "#443A83FF",
-                                 "#31688EFF", "#21908CFF",
-                                 "#35B779FF", "#8FD744FF",
+                                 "#31688EFF", "#1E9B8AFF",
+                                 "#51C56AFF", "#8FD744FF",
                                  "#FDE725FF", "#D2E21BFF"),
     size = 2, force = 5,arrow = arrow(length = unit(0.01, "npc")),
     direction = "both", nudge_x = 750, nudge_y = .003, point.padding = .52, max.overlaps = Inf
@@ -140,7 +147,7 @@ abs(bias_table) %>%
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
                                                        "ht_1" = "Horvitz-Thompson"))) %>%
-  dplyr::filter(N == 25600) -> end_values
+  dplyr::filter(N == 1e5) -> end_values
 
 
 abs(bias_table) %>%
@@ -161,12 +168,12 @@ abs(bias_table) %>%
   ggplot(aes(x = N, y = value, color = Estimator, linetype = Estimator))+
   geom_line(show.legend = FALSE)+
   scale_linetype_manual(values = linetypes)+
-  xlim(0, 40000) +
+  xlim(0, 110000) +
   geom_text_repel(
     aes(label = Estimator),
     data = end_values, color = c("#440154FF", "#443A83FF",
-                                 "#31688EFF", "#21908CFF",
-                                 "#35B779FF", "#8FD744FF",
+                                 "#31688EFF", "#1E9B8AFF",
+                                 "#51C56AFF", "#8FD744FF",
                                  "#FDE725FF", "#D2E21BFF"),
     size = 2, force = 3,arrow = arrow(length = unit(0.01, "npc")),
     direction = "both", nudge_x = 1500, nudge_y = .004, point.padding = .92, max.overlaps = Inf
@@ -190,31 +197,31 @@ rmse_table[,-c(1:3)] <- sqrt(mse_table[,-c(1:3)])
 
 # Plot Experiment 1 ------------------------------------------------------------
 rmse_table %>%
-  dplyr::select(-adjusted_ht_1) %>%
+  dplyr::select(-adjusted_ht_1, -ps_rf1_1) %>%
   dplyr::filter(Exp == 1) %>%
   dplyr::select(-X, -Exp) %>%
   melt(id.vars = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
                                                        "ps1_1" = "PS Matching (True)",
-                                                       "ps_rf1_1" = "PS Matching (RF)",
+                                                       #"ps_rf1_1" = "PS Matching (RF)",
                                                        "ps_logit1_1" = "PS Matching (Logistic)",
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
                                                        "ht_1" = "Horvitz-Thompson"))) %>%
-  dplyr::filter(N == 25600) -> end_values
+  dplyr::filter(N == 1e5) -> end_values
 
 rmse_table %>%
   filter(Exp == 1) %>%
   dplyr::filter(N > 100) %>%
-  dplyr::select(-adjusted_ht_1) %>%
+  dplyr::select(-adjusted_ht_1,-ps_rf1_1) %>%
   dplyr::select(-Exp, -X) %>%
   melt(id = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
                                                        "ps1_1" = "PS Matching (True)",
-                                                       "ps_rf1_1" = "PS Matching (RF)",
+                                                       #"ps_rf1_1" = "PS Matching (RF)",
                                                        "ps_logit1_1" = "PS Matching (Logistic)",
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
@@ -223,17 +230,14 @@ rmse_table %>%
   ggplot(aes(x = N, y = value, color = Estimator, linetype = Estimator))+
   geom_line(show.legend = FALSE)+
   scale_linetype_manual(values = linetypes)+
-  xlim(0, 40000) +
+  xlim(0, 110000) +
   geom_text_repel(
     aes(label = Estimator),
-    data = end_values, color = c("#440154FF", "#443A83FF",
-                                 "#31688EFF", "#21908CFF",
-                                 "#35B779FF", "#8FD744FF",
-                                 "#FDE725FF", "#D2E21BFF"),
+    data = end_values, color = colors,
     size = 2, force = 3,arrow = arrow(length = unit(0.01, "npc")),
     direction = "both", nudge_x = 2500, nudge_y = .01, point.padding = .92, max.overlaps = Inf
   )+
-  scale_color_viridis_d()+
+  scale_color_manual(values = colors)+
   theme_bw()+
   theme(plot.title = element_text(hjust = 0.5))+
   labs(y = "RMSE when estimating ATE", x = "Sample Size", title = "Experiment 1")
@@ -242,31 +246,31 @@ ggsave("code/figures/rmse_experiment1.pdf", height = 4, width = 4)
 
 # Plot Experiment 2 ------------------------------------------------------------
 rmse_table %>%
-  dplyr::select(-adjusted_ht_1) %>%
+  dplyr::select(-adjusted_ht_1,-ps_rf1_1) %>%
   dplyr::filter(Exp == 2) %>%
   dplyr::select(-X, -Exp) %>%
   melt(id.vars = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
                                                        "ps1_1" = "PS Matching (True)",
-                                                       "ps_rf1_1" = "PS Matching (RF)",
+                                                       #"ps_rf1_1" = "PS Matching (RF)",
                                                        "ps_logit1_1" = "PS Matching (Logistic)",
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
                                                        "ht_1" = "Horvitz-Thompson"))) %>%
-  dplyr::filter(N == 25600) -> end_values
+  dplyr::filter(N == 1e5) -> end_values
 
 rmse_table %>%
   filter(Exp == 2) %>%
   dplyr::filter(N > 100) %>%
-  dplyr::select(-adjusted_ht_1) %>%
+  dplyr::select(-adjusted_ht_1,-ps_rf1_1) %>%
   dplyr::select(-Exp, -X) %>%
   melt(id = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
                                                        "ps1_1" = "PS Matching (True)",
-                                                       "ps_rf1_1" = "PS Matching (RF)",
+                                                       #"ps_rf1_1" = "PS Matching (RF)",
                                                        "ps_logit1_1" = "PS Matching (Logistic)",
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
@@ -275,17 +279,14 @@ rmse_table %>%
   ggplot(aes(x = N, y = value, color = Estimator, linetype = Estimator))+
   geom_line(show.legend = FALSE)+
   scale_linetype_manual(values = linetypes)+
-  xlim(0, 40000) +
+  xlim(0, 110000) +
   geom_text_repel(
     aes(label = Estimator),
-    data = end_values, color = c("#440154FF", "#443A83FF",
-                                 "#31688EFF", "#21908CFF",
-                                 "#35B779FF", "#8FD744FF",
-                                 "#FDE725FF", "#D2E21BFF"),
+    data = end_values, color = colors,
     size = 2, force = 3,arrow = arrow(length = unit(0.01, "npc")),
     direction = "both", nudge_x = 3000, nudge_y = .01, point.padding = .92, max.overlaps = Inf
   )+
-  scale_color_viridis_d()+
+  scale_color_manual(values = colors)+
   theme_bw()+
   theme(plot.title = element_text(hjust = 0.5))+
   labs(y = "RMSE when estimating ATE", x = "Sample Size", title = "Experiment 2")
@@ -295,31 +296,31 @@ ggsave("code/figures/rmse_experiment2.pdf", height = 4, width = 4)
 
 # Plot Experiment 3 ------------------------------------------------------------
 rmse_table %>%
-  dplyr::select(-adjusted_ht_1) %>%
+  dplyr::select(-adjusted_ht_1,-ps_rf1_1) %>%
   dplyr::filter(Exp == 3) %>%
   dplyr::select(-X, -Exp) %>%
   melt(id.vars = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
                                                        "ps1_1" = "PS Matching (True)",
-                                                       "ps_rf1_1" = "PS Matching (RF)",
+                                                       #"ps_rf1_1" = "PS Matching (RF)",
                                                        "ps_logit1_1" = "PS Matching (Logistic)",
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
                                                        "ht_1" = "Horvitz-Thompson"))) %>%
-  dplyr::filter(N == 25600) -> end_values
+  dplyr::filter(N == 1e5) -> end_values
 
 rmse_table %>%
   filter(Exp == 3) %>%
   dplyr::filter(N > 100) %>%
-  dplyr::select(-adjusted_ht_1) %>%
+  dplyr::select(-adjusted_ht_1,-ps_rf1_1) %>%
   dplyr::select(-Exp, -X) %>%
   melt(id = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
                                                        "ps1_1" = "PS Matching (True)",
-                                                       "ps_rf1_1" = "PS Matching (RF)",
+                                                       #"ps_rf1_1" = "PS Matching (RF)",
                                                        "ps_logit1_1" = "PS Matching (Logistic)",
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
@@ -328,17 +329,14 @@ rmse_table %>%
   ggplot(aes(x = N, y = value, color = Estimator, linetype = Estimator))+
   geom_line(show.legend = FALSE)+
   scale_linetype_manual(values = linetypes)+
-  xlim(0, 40000) +
+  xlim(0, 110000) +
   geom_text_repel(
     aes(label = Estimator),
-    data = end_values, color = c("#440154FF", "#443A83FF",
-                                 "#31688EFF", "#21908CFF",
-                                 "#35B779FF", "#8FD744FF",
-                                 "#FDE725FF", "#D2E21BFF"),
+    data = end_values, color = colors,
     size = 2, force = 3,arrow = arrow(length = unit(0.01, "npc")),
     direction = "both", nudge_x = 4000, nudge_y = 0, point.padding = .52, max.overlaps = Inf
   )+
-  scale_color_viridis_d()+
+  scale_color_manual(values = colors)+
   theme_bw()+
   theme(plot.title = element_text(hjust = 0.5))+
   guides(colour = guide_legend(title.position = "top"))+
