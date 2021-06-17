@@ -18,10 +18,10 @@ linetypes <- c("PS Matching (True)" = "solid",
                "NN Matching" = "dotted",
                "RF" = "dotted")
 
-colors = c("aquamarine", #"#8FD744FF",
-           "darkorange", "deeppink",
+colors = c("cornflowerblue", #"#8FD744FF",
+           "darkorange", "darkred",
            "brown1",
-           "chartreuse", "deepskyblue",
+           "darkgreen", "deepskyblue",
            "blue"
            )
 
@@ -235,7 +235,7 @@ rmse_table %>%
     aes(label = Estimator),
     data = end_values, color = colors,
     size = 2, force = 3,arrow = arrow(length = unit(0.01, "npc")),
-    direction = "both", nudge_x = 2500, nudge_y = .01, point.padding = .92, max.overlaps = Inf
+    direction = "both", nudge_x = 500, nudge_y = .005, point.padding = .72, max.overlaps = Inf
   )+
   scale_color_manual(values = colors)+
   theme_bw()+
@@ -284,7 +284,7 @@ rmse_table %>%
     aes(label = Estimator),
     data = end_values, color = colors,
     size = 2, force = 3,arrow = arrow(length = unit(0.01, "npc")),
-    direction = "both", nudge_x = 3000, nudge_y = .01, point.padding = .92, max.overlaps = Inf
+    direction = "both", nudge_x = 1000, nudge_y = .02, point.padding = .92, max.overlaps = Inf
   )+
   scale_color_manual(values = colors)+
   theme_bw()+
@@ -330,11 +330,12 @@ rmse_table %>%
   geom_line(show.legend = FALSE)+
   scale_linetype_manual(values = linetypes)+
   xlim(0, 110000) +
+  ylim(0,.35)+
   geom_text_repel(
     aes(label = Estimator),
     data = end_values, color = colors,
     size = 2, force = 3,arrow = arrow(length = unit(0.01, "npc")),
-    direction = "both", nudge_x = 4000, nudge_y = 0, point.padding = .52, max.overlaps = Inf
+    direction = "both", nudge_x = 500, nudge_y = .05, point.padding = .52, max.overlaps = Inf
   )+
   scale_color_manual(values = colors)+
   theme_bw()+
