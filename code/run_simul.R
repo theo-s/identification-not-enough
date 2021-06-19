@@ -98,7 +98,7 @@ res <- data.frame(N = NA,
                   dr_logit = NA,
                   cross_fit = NA)
 
-for (n in c(1000, 10000)) {
+for (n in c(1000, 10000, 100000)) {
   experiment_1 <- run_sim(p_score = linear_ps,
                           mu_1 = linear,
                           n=n,
