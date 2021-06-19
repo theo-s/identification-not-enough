@@ -6,8 +6,10 @@ all_data <- data.frame()
 
 for (file in dir("code/results")) {
   print(file)
-  data <- readRDS(paste0("code/results/",file))
-  all_data <- rbind(all_data, data)
+  if (substr(file, 1,3) == "new") {
+    data <- readRDS(paste0("code/results/",file))
+    all_data <- rbind(all_data, data)
+  }
 }
 
 all_data %>%
@@ -45,7 +47,7 @@ all_data %>%
   group_by(N,Exp) %>%
   summarise(across(everything(), list(mean))) -> mse_table
 
-write.csv(mse_table, file = "code/MSEtable.csv")
+write.csv(mse_table, file = "code/newMSEtable.csv")
 
 
 # Get variance -----------------------------------------------------------------

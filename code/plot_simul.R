@@ -16,16 +16,12 @@ linetypes <- c("PS Matching (True)" = "solid",
                "PS Matching (Logistic)" = "dashed",
                "Logistic" = "dotted",
                "NN Matching" = "dotted",
-               "RF" = "dotted")
+               "RF" = "dotted",
+               "CF RF" = "solid",
+               "DR Logit" = "dashed")
 
-colors = c("cornflowerblue", #"#8FD744FF",
-           "darkorange", "darkred",
-           "brown1",
-           "darkgreen", "deepskyblue",
-           "blue"
-           )
 safe_colorblind_palette <- c("#88CCEE", "#CC6677", "#DDCC77", "#117733", "#332288", "#AA4499",
-                             #"#44AA99", "#999933",
+                             "#44AA99", "#999933",
                              "#882255")#, "#661100", "#6699CC", "#888888")
 scales::show_col(safe_colorblind_palette)
 colors <- safe_colorblind_palette
@@ -199,6 +195,12 @@ mse_table <- read.csv(file = "code/MSEtable.csv")
 rmse_table <- mse_table
 rmse_table[,-c(1:3)] <- sqrt(mse_table[,-c(1:3)])
 
+new_mse_table <- read.csv(file = "code/newMSEtable.csv")
+new_rmse_table <- new_mse_table
+new_rmse_table[,-c(1:3)] <- sqrt(new_mse_table[,-c(1:3)])
+
+rmse_table <- cbind(rmse_table, new_rmse_table[,c(4,5)])
+
 # Plot Experiment 1 ------------------------------------------------------------
 rmse_table %>%
   dplyr::select(-adjusted_ht_1, -ps_rf1_1) %>%
@@ -213,6 +215,8 @@ rmse_table %>%
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
+                                                       "cross_fit_1" = "CF RF",
+                                                       "dr_logit_1" = "DR Logit",
                                                        "ht_1" = "Horvitz-Thompson"))) %>%
   dplyr::filter(N == 1e5) -> end_values
 
@@ -230,6 +234,8 @@ rmse_table %>%
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
+                                                       "cross_fit_1" = "CF RF",
+                                                       "dr_logit_1" = "DR Logit",
                                                        "ht_1" = "Horvitz-Thompson"))) %>%
   ggplot(aes(x = N, y = value, color = Estimator, linetype = Estimator))+
   geom_line(show.legend = FALSE)+
@@ -262,6 +268,8 @@ rmse_table %>%
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
+                                                       "cross_fit_1" = "CF RF",
+                                                       "dr_logit_1" = "DR Logit",
                                                        "ht_1" = "Horvitz-Thompson"))) %>%
   dplyr::filter(N == 1e5) -> end_values
 
@@ -279,6 +287,8 @@ rmse_table %>%
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
+                                                       "cross_fit_1" = "CF RF",
+                                                       "dr_logit_1" = "DR Logit",
                                                        "ht_1" = "Horvitz-Thompson"))) %>%
   ggplot(aes(x = N, y = value, color = Estimator, linetype = Estimator))+
   geom_line(show.legend = FALSE)+
@@ -312,6 +322,8 @@ rmse_table %>%
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
+                                                       "cross_fit_1" = "CF RF",
+                                                       "dr_logit_1" = "DR Logit",
                                                        "ht_1" = "Horvitz-Thompson"))) %>%
   dplyr::filter(N == 1e5) -> end_values
 
@@ -329,6 +341,8 @@ rmse_table %>%
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
+                                                       "cross_fit_1" = "CF RF",
+                                                       "dr_logit_1" = "DR Logit",
                                                        "ht_1" = "Horvitz-Thompson"))) %>%
   ggplot(aes(x = N, y = value, color = Estimator, linetype = Estimator))+
   geom_line(show.legend = FALSE)+
