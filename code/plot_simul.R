@@ -24,7 +24,11 @@ colors = c("cornflowerblue", #"#8FD744FF",
            "darkgreen", "deepskyblue",
            "blue"
            )
-
+safe_colorblind_palette <- c("#88CCEE", "#CC6677", "#DDCC77", "#117733", "#332288", "#AA4499",
+                             #"#44AA99", "#999933",
+                             "#882255")#, "#661100", "#6699CC", "#888888")
+scales::show_col(safe_colorblind_palette)
+colors <- safe_colorblind_palette
 
 # Plot Experiment 1 ------------------------------------------------------------
 abs(bias_table) %>%
