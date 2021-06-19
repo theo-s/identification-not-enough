@@ -182,6 +182,70 @@ adjusted_ht <- function(
   return(mean(sapply(pred_out, logit)))
 }
 
+cross_fit <- function(
+  X_train,
+  Tr_train,
+  Y_train,
+  p_scores
+) {
+  library(Rforestry)
+  sample_1 <- sample(1:length(X_train), size = round(.5*length(X_train)), replace = FALSE)
+  sample_2 <- (1:length(X_train))[!(1:length(X_train) %in% sample_1)]
+  
+  data_1 <- data.frame(v1 = X_train[sample_1])
+  data_2 <- data.frame(v1 = X_train[sample_2])
+  
+  y_1 <- Y_train[sample_1]
+  y_2 <- Y_train[sample_2]
+  
+  tr_1 <- Tr_train[sample_1]
+  tr_2 <- Tr_train[sample_2]
+  
+  p_1 <- p_scores[sample_1]
+  p_2 <- p_scores[sample_2]
+  
+  fit_1 <- Rforestry::forestry(x = data_1,
+                               y = y_1)
+  
+  fit_2 <- Rforestry::forestry(x = data_2,
+                               y = y_2)
+  
+  y_pred_1 <- predict(fit_2, data_1)
+  y_pred_2 <- predict(fit_1, data_2)
+  
+  ate_1 <- mean((y_1-y_pred_1)*tr_1/p_1 + y_pred_1)
+  ate_2 <- mean((y_2-y_pred_2)*tr_2/p_2 + y_pred_2)
+  return(.5*ate_1 + .5*ate_2)
+}
+
+dr_logit <- function(
+  X_train,
+  Tr_train,
+  Y_train,
+  p_scores
+) {
+  model_outcome <- glm(Y_train ~.,
+                       data = data.frame(X_train = X_train,
+                                         Y_train = Y_train),
+                       family = "binomial")
+  
+  pred_out <- predict(model_outcome,
+                      newdata = data.frame(X_train = X_train),
+                      type = "response")
+  
+  model_p <- glm(Tr_train ~.,
+                 data = data.frame(X_train = X_train,
+                                   Tr_train = Tr_train),
+                 family = "binomial")
+  
+  pred_p <- predict(model_p,
+                    newdata = data.frame(Tr_train = Tr_train),
+                    type = "response")
+  
+  cate <- Tr_train*Y_train / pred_p - (Tr_train - pred_p)*pred_out/pred_p
+  return(mean(cate))
+}
+
 loop_rf <- function(
   X_train,
   Tr_train,
@@ -255,54 +319,65 @@ run_sim <- function(
   Y <- Y #+ rnorm(n, sd = sd) # Noiseless for now
 
   results <- list()
-  results[["ht"]] <- try(ht(X_train = X,
-                            Y_train = Y,
-                            Tr_train = Tr,
-                            p_scores = p_scores))
   
-  results[["adjusted_ht"]] <- try(adjusted_ht(X_train = X,
-                                              Y_train = Y,
-                                              Tr_train = Tr,
-                                              p_scores = p_scores))
-
-  results[["loop_rf"]] <- try(loop_rf(X_train = X,
-                                      Y_train = Y,
-                                      Tr_train = Tr,
-                                      p_scores = p_scores))
-
-  results[["nn1"]] <- try(nn_matching(X_train = X,
-                                      Y_train = Y,
-                                      Tr_train = Tr,
-                                      p_scores = p_scores,
-                                      M=1))
-
-  results[["ps1"]] <- try(ps_matching_true(X_train = X,
-                                           Y_train = Y,
-                                           Tr_train = Tr,
-                                           p_scores = p_scores,
-                                           M=1))
-
-  results[["ps_rf1"]] <- try(ps_matching_rf(X_train = X,
-                                            Y_train = Y,
-                                            Tr_train = Tr,
-                                            p_scores = p_scores,
-                                            M=1))
+  results[["dr_logit"]] <- try(dr_logit(X_train = X,
+                                        Y_train = Y,
+                                        Tr_train = Tr,
+                                        p_scores = p_scores))
   
-  results[["ps_logit1"]] <- try(ps_matching_logit(X_train = X,
-                                                  Y_train = Y,
-                                                  Tr_train = Tr,
-                                                  p_scores = p_scores,
-                                                  M=1))
-
-  results[["rf"]] <- try(rf(X_train = X,
-                            Y_train = Y,
-                            Tr_train = Tr,
-                            p_scores = p_scores))
-
-  results[["lr"]] <- try(lr(X_train = X,
-                            Y_train = Y,
-                            Tr_train = Tr,
-                            p_scores = p_scores))
+  results[["cross_fit"]] <- try(cross_fit(X_train = X,
+                                          Y_train = Y,
+                                          Tr_train = Tr,
+                                          p_scores = p_scores))
+  
+  # results[["ht"]] <- try(ht(X_train = X,
+  #                           Y_train = Y,
+  #                           Tr_train = Tr,
+  #                           p_scores = p_scores))
+  # 
+  # results[["adjusted_ht"]] <- try(adjusted_ht(X_train = X,
+  #                                             Y_train = Y,
+  #                                             Tr_train = Tr,
+  #                                             p_scores = p_scores))
+  # 
+  # results[["loop_rf"]] <- try(loop_rf(X_train = X,
+  #                                     Y_train = Y,
+  #                                     Tr_train = Tr,
+  #                                     p_scores = p_scores))
+  # 
+  # results[["nn1"]] <- try(nn_matching(X_train = X,
+  #                                     Y_train = Y,
+  #                                     Tr_train = Tr,
+  #                                     p_scores = p_scores,
+  #                                     M=1))
+  # 
+  # results[["ps1"]] <- try(ps_matching_true(X_train = X,
+  #                                          Y_train = Y,
+  #                                          Tr_train = Tr,
+  #                                          p_scores = p_scores,
+  #                                          M=1))
+  # 
+  # results[["ps_rf1"]] <- try(ps_matching_rf(X_train = X,
+  #                                           Y_train = Y,
+  #                                           Tr_train = Tr,
+  #                                           p_scores = p_scores,
+  #                                           M=1))
+  # 
+  # results[["ps_logit1"]] <- try(ps_matching_logit(X_train = X,
+  #                                                 Y_train = Y,
+  #                                                 Tr_train = Tr,
+  #                                                 p_scores = p_scores,
+  #                                                 M=1))
+  # 
+  # results[["rf"]] <- try(rf(X_train = X,
+  #                           Y_train = Y,
+  #                           Tr_train = Tr,
+  #                           p_scores = p_scores))
+  # 
+  # results[["lr"]] <- try(lr(X_train = X,
+  #                           Y_train = Y,
+  #                           Tr_train = Tr,
+  #                           p_scores = p_scores))
 
   return(results)
 

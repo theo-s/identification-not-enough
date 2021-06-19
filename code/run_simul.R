@@ -80,19 +80,25 @@ nonlinear <- function(x) {
 
 # Run a sim of each DGP -------------------------------------------------------
 
-res <- data.frame(N = NA,
-                  Exp = NA,
-                  nn1 = NA,
-                  ht = NA,
-                  adjusted_ht = NA,
-                  loop_rf = NA,
-                  ps1 = NA,
-                  ps_rf1 = NA,
-                  ps_logit1 = NA,
-                  lr = NA,
-                  rf = NA)
+#res <- data.frame(N = NA,
+#                  Exp = NA,
+#                  nn1 = NA,
+#                  ht = NA,
+#                  adjusted_ht = NA,
+#                  loop_rf = NA,
+#                  ps1 = NA,
+#                  ps_rf1 = NA,
+#                  ps_logit1 = NA,
+#                  lr = NA,
+#                  rf = NA
+#                  )
 
-for (n in c(100, 200, 400, 800, 1600, 3200, 6400, 12800, 25600)) {
+res <- data.frame(N = NA, 
+                  Exp = NA,
+                  dr_logit = NA,
+                  cross_fit = NA)
+
+for (n in c(1000, 10000)) {
   experiment_1 <- run_sim(p_score = linear_ps,
                           mu_1 = linear,
                           n=n,
@@ -100,15 +106,8 @@ for (n in c(100, 200, 400, 800, 1600, 3200, 6400, 12800, 25600)) {
 
   res <- rbind(res, c(n,
                       1,
-                      experiment_1$nn1,
-                      experiment_1$ht,
-                      experiment_1$adjusted_ht,
-                      experiment_1$loop_rf,
-                      experiment_1$ps1,
-                      experiment_1$ps_rf1,
-                      experiment_1$ps_logit1,
-                      experiment_1$lr,
-                      experiment_1$rf))
+                      experiment_1$dr_logit,
+                      experiment_1$cross_fit))
   print(res)
 
   experiment_2 <- run_sim(p_score = smooth_ps,
@@ -118,15 +117,8 @@ for (n in c(100, 200, 400, 800, 1600, 3200, 6400, 12800, 25600)) {
 
   res <- rbind(res, c(n,
                       2,
-                      experiment_2$nn1,
-                      experiment_2$ht,
-                      experiment_2$adjusted_ht,
-                      experiment_2$loop_rf,
-                      experiment_2$ps1,
-                      experiment_2$ps_rf1,
-                      experiment_2$ps_logit1,
-                      experiment_2$lr,
-                      experiment_2$rf))
+                      experiment_2$dr_logit,
+                      experiment_2$cross_fit))
   print(res)
   
   experiment_3 <- run_sim(p_score = nonlinear_ps,
@@ -136,19 +128,12 @@ for (n in c(100, 200, 400, 800, 1600, 3200, 6400, 12800, 25600)) {
   
   res <- rbind(res, c(n,
                       3,
-                      experiment_3$nn1,
-                      experiment_3$ht,
-                      experiment_3$adjusted_ht,
-                      experiment_3$loop_rf,
-                      experiment_3$ps1,
-                      experiment_3$ps_rf1,
-                      experiment_3$ps_logit1,
-                      experiment_3$lr,
-                      experiment_3$rf))
+                      experiment_3$dr_logit,
+                      experiment_3$cross_fit))
   print(res)
 }
 
-filename <- paste0("code/results/sim_res_",seed,".RDS")
+filename <- paste0("code/results/new_sim_res_",seed,".RDS")
 saveRDS(res[-1,], filename)
 
 
