@@ -413,3 +413,39 @@ legend <- cowplot::get_legend(p3)
 as_ggplot(legend)
 
 ggsave("code/figures/legend.pdf", height = 4, width = 4)
+
+
+library(kableExtra)
+library(magick)
+
+
+names <- data.frame(Estimator = c( "Nearest Neighbor Matching",
+                                   "Logistic Regression",
+                                   "Random Forest",
+                                   "Double Robust Estimator using Logistic Regression",
+                                   "Propensity Score Matching on Logistic Estimated Propensity Score",
+                                   "Standard Horvitz-Thompson Estimator",
+                                   "Leave-one-out Random Forest Adjusted Horvitz-Thompson Estimator",
+                                   "Propensity Score Matching on True Propensity Score",
+                                   "Cross-fitting Horvitz-Thompson Estimator with Random Forest for Covariate Adjustment" ),
+                    Shorthand = c("NN Matching",
+                                  "Logistic",
+                                  "RF",
+                                  "DR Logit",
+                                  "PS Matching (Logistic)",
+                                  "Horvitz-Thompson",
+                                  "LOO RF",
+                                  "PS Matching (True)",
+                                  "CF RF"))
+
+names %>%
+  kbl(booktabs = TRUE) %>%
+  kable_paper("striped", full_width = F) %>%
+  column_spec(1, border_left = "2px solid black") %>%
+  column_spec(2, border_right = "2px solid black") %>%
+  pack_rows("No Propensity Score Used", 1, 3) %>%
+  pack_rows("Estimated Propensity Score Used", 4, 5) %>%
+  pack_rows("True Propensity Score Used", 6, 9) %>%
+  save_kable("code/figures/table.pdf")
+
+
