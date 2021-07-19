@@ -375,6 +375,7 @@ rmse_table %>%
   dplyr::filter(N > 100) %>%
   dplyr::select(-adjusted_ht_1,-ps_rf1_1) %>%
   dplyr::select(-Exp, -X) %>%
+  dplyr::select(N,nn1_1, lr_1,rf_1,dr_logit_1,ps_logit1_1,ht_1,loop_rf_1,ps1_1,cross_fit_1) %>%
   melt(id = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
