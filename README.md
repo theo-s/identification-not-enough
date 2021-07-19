@@ -21,4 +21,6 @@ in `code/figures`/):
 
 ```
 Rscript code/plot_simul.R
+Rscript code/postprocess_simul.R
 ```
+The resulting figures will then be saved in `figures`.
