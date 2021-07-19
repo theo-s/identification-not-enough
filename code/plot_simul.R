@@ -370,6 +370,15 @@ rmse_table %>%
 
 ggsave("code/figures/rmse_experiment3.pdf", height = 4, width = 4)
 
+# Plot the legend ==============================================================
+
+#safe_colorblind_palette <- c("#88CCEE", "#CC6677", "#DDCC77", "#117733", "#332288", "#AA4499",
+#                             "#44AA99", "#999933",
+#                             "#882255")
+
+safe_colorblind_palette <- c("#88CCEE", "#AA4499","#44AA99", "#999933","#332288","#CC6677","#DDCC77","#117733" ,
+                             "#882255")
+colors <- safe_colorblind_palette
 rmse_table %>%
   filter(Exp == 3) %>%
   dplyr::filter(N > 100) %>%
@@ -380,7 +389,6 @@ rmse_table %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
                                                        "ps1_1" = "PS Matching (True)",
-                                                       #"ps_rf1_1" = "PS Matching (RF)",
                                                        "ps_logit1_1" = "PS Matching (Logistic)",
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
@@ -389,7 +397,7 @@ rmse_table %>%
                                                        "dr_logit_1" = "DR Logit",
                                                        "ht_1" = "Horvitz-Thompson"))) %>%
   ggplot(aes(x = N, y = value, color = Estimator, linetype = Estimator))+
-  geom_line(show.legend = TRUE)+
+  geom_line(show.legend = TRUE, size = 2)+
   scale_linetype_manual(values = linetypes)+
   xlim(0, 110000) +
   ylim(0,.35)+
@@ -404,15 +412,18 @@ rmse_table %>%
   theme(plot.title = element_text(hjust = 0.5))+
   guides(colour = guide_legend(title.position = "top"))+
   theme(legend.position = "left",
-        legend.key.height = unit(.7, 'cm'), #change legend key height
-        legend.key.width = unit(1, 'cm'),
-        legend.key.size = unit(6, 'cm'))+
+        legend.key.height = unit(.6, 'cm'), #change legend key height
+        legend.key.width = unit(3, 'cm'),
+        legend.spacing.x = unit(.1, 'cm'),
+        legend.spacing.y = unit(.02, 'cm'),
+        legend.key.size = unit(8, 'cm'),
+        legend.title.align = .5)+
   labs(y = "RMSE when estimating ATE", x = "Sample Size", title = "Experiment 3") -> p3
 
 legend <- cowplot::get_legend(p3)
 as_ggplot(legend)
 
-ggsave("code/figures/legend.pdf", height = 4, width = 4)
+ggsave("code/figures/legend.pdf", height = 2.5, width = 2.5)
 
 
 library(kableExtra)
@@ -427,7 +438,7 @@ names <- data.frame(Estimator = c( "Nearest Neighbor Matching",
                                    "Standard Horvitz-Thompson Estimator",
                                    "Leave-one-out Random Forest Adjusted Horvitz-Thompson Estimator",
                                    "Propensity Score Matching on True Propensity Score",
-                                   "Cross-fitting Horvitz-Thompson Estimator with Random Forest for Covariate Adjustment" ),
+                                   "Cross-fitting Horvitz-Thompson Estimator with RF for Covariate Adjustment" ),
                     Shorthand = c("NN Matching",
                                   "Logistic",
                                   "RF",
@@ -446,6 +457,6 @@ names %>%
   pack_rows("No Propensity Score Used", 1, 3) %>%
   pack_rows("Estimated Propensity Score Used", 4, 5) %>%
   pack_rows("True Propensity Score Used", 6, 9) %>%
-  save_kable("code/figures/table.pdf")
+  save_kable("code/figures/table.pdf",density = 1000)
 
 
