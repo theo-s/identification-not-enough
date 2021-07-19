@@ -4,6 +4,8 @@ library(viridis)
 library(reshape)
 library(scales)
 library(ggrepel)
+library(cowplot)
+library(ggpubr)
 
 # Plot Bias --------------------------------------------------------------------
 bias_table <- read.csv(file = "code/BIAStable.csv")
@@ -247,7 +249,7 @@ rmse_table %>%
     size = 2, force = 3,arrow = arrow(length = unit(0.01, "npc")),
     direction = "both", nudge_x = 500, nudge_y = .005, point.padding = .72, max.overlaps = Inf
   )+
-  scale_color_manual(values = colors)+
+  scale_color_manual(values = colors, breaks = unique(as.factor(Estimator)))+
   theme_bw()+
   theme(plot.title = element_text(hjust = 0.5))+
   labs(y = "RMSE when estimating ATE", x = "Sample Size", title = "Experiment 1")
@@ -365,4 +367,48 @@ rmse_table %>%
         legend.key.size = unit(4.5, 'cm'))+
   labs(y = "RMSE when estimating ATE", x = "Sample Size", title = "Experiment 3")
 
-ggsave("code/figures/rmse_experiment3.pdf", height = 4.67, width = 4)
+
+ggsave("code/figures/rmse_experiment3.pdf", height = 4, width = 4)
+
+rmse_table %>%
+  filter(Exp == 3) %>%
+  dplyr::filter(N > 100) %>%
+  dplyr::select(-adjusted_ht_1,-ps_rf1_1) %>%
+  dplyr::select(-Exp, -X) %>%
+  melt(id = "N") %>%
+  dplyr::rename(Estimator = variable) %>%
+  dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
+                                                       "ps1_1" = "PS Matching (True)",
+                                                       #"ps_rf1_1" = "PS Matching (RF)",
+                                                       "ps_logit1_1" = "PS Matching (Logistic)",
+                                                       "lr_1" = "Logistic",
+                                                       "rf_1" = "RF",
+                                                       "loop_rf_1" = "LOO RF ",
+                                                       "cross_fit_1" = "CF RF",
+                                                       "dr_logit_1" = "DR Logit",
+                                                       "ht_1" = "Horvitz-Thompson"))) %>%
+  ggplot(aes(x = N, y = value, color = Estimator, linetype = Estimator))+
+  geom_line(show.legend = TRUE)+
+  scale_linetype_manual(values = linetypes)+
+  xlim(0, 110000) +
+  ylim(0,.35)+
+  geom_text_repel(
+    aes(label = Estimator),
+    data = end_values, color = colors,
+    size = 2, force = 3,arrow = arrow(length = unit(0.01, "npc")),
+    direction = "both", nudge_x = 500, nudge_y = .05, point.padding = .52, max.overlaps = Inf
+  )+
+  scale_color_manual(values = colors)+
+  theme_bw()+
+  theme(plot.title = element_text(hjust = 0.5))+
+  guides(colour = guide_legend(title.position = "top"))+
+  theme(legend.position = "left",
+        legend.key.height = unit(.7, 'cm'), #change legend key height
+        legend.key.width = unit(1, 'cm'),
+        legend.key.size = unit(6, 'cm'))+
+  labs(y = "RMSE when estimating ATE", x = "Sample Size", title = "Experiment 3") -> p3
+
+legend <- cowplot::get_legend(p3)
+as_ggplot(legend)
+
+ggsave("code/figures/legend.pdf", height = 4, width = 4)
