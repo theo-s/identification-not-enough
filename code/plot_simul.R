@@ -277,7 +277,7 @@ library(magick)
 names <- data.frame(Estimator = c( "Nearest Neighbor Matching",
                                    "Linear Logistic Regression",
                                    "Random Forest",
-                                   "Double Robust Estimator using Logistic Regression",
+                                   "Double Robust Estimator using Linear Logistic Regression",
                                    #"Propensity Score Matching on Logistic Estimated Propensity Score",
                                    "Standard Horvitz-Thompson Estimator",
                                    "Leave-one-out Random Forest Adjusted Horvitz-Thompson Estimator",
@@ -291,13 +291,15 @@ names <- data.frame(Estimator = c( "Nearest Neighbor Matching",
                                   "Horvitz-Thompson",
                                   "LOO RF",
                                   "PS Matching (True)",
-                                  "CF RF"))
+                                  "CF RF"),
+                    Line = "")
 
 names %>%
   kbl(booktabs = TRUE) %>%
   kable_paper("striped", full_width = F) %>%
   column_spec(1, border_left = "2px solid black") %>%
   column_spec(2, border_right = "2px solid black") %>%
+  column_spec(3, background = colors) %>%
   pack_rows("No Propensity Score Used", 1, 3) %>%
   pack_rows("Estimated Propensity Score Used", 4, 4) %>%
   pack_rows("True Propensity Score Used", 5, 8) %>%
