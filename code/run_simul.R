@@ -93,9 +93,12 @@ nonlinear <- function(x) {
 #                  rf = NA
 #                  )
 
-res <- data.frame(N = NA, 
+res <- data.frame(N = NA,
                   Exp = NA,
                   dr_logit = NA,
+                  dr_RF_Pscore_CF = NA,
+                  dr_RF_Pscore = NA,
+                  dr_noCF = NA,
                   cross_fit = NA)
 
 for (n in c(1000, 10000, 100000)) {
@@ -107,6 +110,9 @@ for (n in c(1000, 10000, 100000)) {
   res <- rbind(res, c(n,
                       1,
                       experiment_1$dr_logit,
+                      experiment_1$dr_RF_Pscore_CF,
+                      experiment_1$dr_RF_Pscore,
+                      experiment_1$dr_noCF,
                       experiment_1$cross_fit))
   print(res)
 
@@ -118,17 +124,23 @@ for (n in c(1000, 10000, 100000)) {
   res <- rbind(res, c(n,
                       2,
                       experiment_2$dr_logit,
+                      experiment_2$dr_RF_Pscore_CF,
+                      experiment_2$dr_RF_Pscore,
+                      experiment_2$dr_noCF,
                       experiment_2$cross_fit))
   print(res)
-  
+
   experiment_3 <- run_sim(p_score = nonlinear_ps,
                           mu_1 = nonlinear,
                           n=n,
                           seed=seed)
-  
+
   res <- rbind(res, c(n,
                       3,
                       experiment_3$dr_logit,
+                      experiment_3$dr_RF_Pscore_CF,
+                      experiment_3$dr_RF_Pscore,
+                      experiment_3$dr_noCF,
                       experiment_3$cross_fit))
   print(res)
 }
