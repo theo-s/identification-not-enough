@@ -40,15 +40,15 @@ colors <- c("NN Matching" = "#88CCEE",
 
 col2 <- c("#88CCEE",
           "#6699CC",
-          "#661100",
           "#332288",
           "#CC6677",
-          "#DDCC77",
-          "#888888",
           "#AA4499",
           "#44AA99",
           "#999933",
-          "#117733")
+          "#117733",
+          "#DDCC77",
+          "#888888",
+          "#661100")
 
 # Plot sqrt(var) --------------------------------------------------------------------
 mse_table <- read.csv(file = "code/MSEtable.csv")
@@ -59,20 +59,24 @@ new_mse_table <- read.csv(file = "code/newMSEtable.csv")
 new_rmse_table <- new_mse_table
 new_rmse_table[,-c(1:3)] <- sqrt(new_mse_table[,-c(1:3)])
 
-rmse_table <- cbind(rmse_table, new_rmse_table[,c(4,5)])
+final_mse_table <- read.csv(file = "code/finalMSEtable.csv")
+final_rmse_table <- final_mse_table
+final_rmse_table[,-c(1:3)] <- sqrt(final_rmse_table[,-c(1:3)])
+
+rmse_table <- cbind(rmse_table, new_rmse_table[,c(4,5)], final_rmse_table[,c(5,6,8)])
 
 # Plot Experiment 1 ------------------------------------------------------------
 rmse_table %>%
   dplyr::filter(Exp == 1) %>%
-  #dplyr::select(-adjusted_ht_1,-ps_rf1_1,-ps_logit1_1) %>%
+  dplyr::select(-adjusted_ht_1,-ps_rf1_1,-ps_logit1_1) %>%
   dplyr::select(-X, -Exp) %>%
   melt(id.vars = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
                                                        "ps1_1" = "PS Matching (True)",
-                                                       "ps_rf1_1" = "DRRF",
-                                                       "ps_logit1_1" = "DRRF CF",
-                                                       "adjusted_ht_1" = "HT RF",
+                                                       "dr_RF_Pscore_1" = "DRRF",
+                                                       "dr_RF_Pscore_CF_1" = "DRRF CF",
+                                                       "dr_noCF_1" = "HT RF",
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
@@ -84,16 +88,16 @@ rmse_table %>%
 rmse_table %>%
   filter(Exp == 1) %>%
   dplyr::filter(N > 100) %>%
-  #dplyr::select(-adjusted_ht_1,-ps_rf1_1,-ps_logit1_1) %>%
+  dplyr::select(-adjusted_ht_1,-ps_rf1_1,-ps_logit1_1) %>%
   dplyr::select(-Exp, -X) %>%
-  dplyr::select(N,nn1_1, lr_1,rf_1,dr_logit_1,ht_1,loop_rf_1,ps1_1,cross_fit_1,adjusted_ht_1,ps_rf1_1,ps_logit1_1) %>%
+  dplyr::select(N,nn1_1, lr_1,rf_1,dr_logit_1,ht_1,loop_rf_1,ps1_1,cross_fit_1,dr_noCF_1,dr_RF_Pscore_1,dr_RF_Pscore_CF_1) %>%
   melt(id = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
                                                        "ps1_1" = "PS Matching (True)",
-                                                       "ps_rf1_1" = "DRRF",
-                                                       "ps_logit1_1" = "DRRF CF",
-                                                       "adjusted_ht_1" = "HT RF",
+                                                       "dr_RF_Pscore_1" = "DRRF",
+                                                       "dr_RF_Pscore_CF_1" = "DRRF CF",
+                                                       "dr_noCF_1" = "HT RF",
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
@@ -105,6 +109,7 @@ rmse_table %>%
   scale_linetype_manual(values = linetypes)+
   scale_color_manual(values = colors)+
   xlim(0, 110000) +
+  ylim(0,.04)+
   geom_text_repel(
     aes(label = Estimator),
     data = end_values, color = col2,
@@ -119,16 +124,16 @@ ggsave("code/figures/rmse_experiment1.pdf", height = 4, width = 4)
 
 # Plot Experiment 2 ------------------------------------------------------------
 rmse_table %>%
-  #dplyr::select(-adjusted_ht_1,-ps_rf1_1,-ps_logit1_1) %>%
+  dplyr::select(-adjusted_ht_1,-ps_rf1_1,-ps_logit1_1) %>%
   dplyr::filter(Exp == 2) %>%
   dplyr::select(-X, -Exp) %>%
   melt(id.vars = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
                                                        "ps1_1" = "PS Matching (True)",
-                                                       "ps_rf1_1" = "DRRF",
-                                                       "ps_logit1_1" = "DRRF CF",
-                                                       "adjusted_ht_1" = "HT RF",
+                                                       "dr_RF_Pscore_1" = "DRRF",
+                                                       "dr_RF_Pscore_CF_1" = "DRRF CF",
+                                                       "dr_noCF_1" = "HT RF",
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
@@ -140,16 +145,16 @@ rmse_table %>%
 rmse_table %>%
   filter(Exp == 2) %>%
   dplyr::filter(N > 100) %>%
-  #dplyr::select(-adjusted_ht_1,-ps_rf1_1,-ps_logit1_1) %>%
+  dplyr::select(-adjusted_ht_1,-ps_rf1_1,-ps_logit1_1) %>%
   dplyr::select(-Exp, -X) %>%
-  dplyr::select(N,nn1_1, lr_1,rf_1,dr_logit_1,ht_1,loop_rf_1,ps1_1,cross_fit_1,adjusted_ht_1,ps_rf1_1,ps_logit1_1) %>%
+  dplyr::select(N,nn1_1, lr_1,rf_1,dr_logit_1,ht_1,loop_rf_1,ps1_1,cross_fit_1,dr_noCF_1,dr_RF_Pscore_1,dr_RF_Pscore_CF_1) %>%
   melt(id = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
                                                        "ps1_1" = "PS Matching (True)",
-                                                       "ps_rf1_1" = "DRRF",
-                                                       "ps_logit1_1" = "DRRF CF",
-                                                       "adjusted_ht_1" = "HT RF",
+                                                       "dr_RF_Pscore_1" = "DRRF",
+                                                       "dr_RF_Pscore_CF_1" = "DRRF CF",
+                                                       "dr_noCF_1" = "HT RF",
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
@@ -161,6 +166,7 @@ rmse_table %>%
   scale_linetype_manual(values = linetypes)+
   scale_color_manual(values = colors)+
   xlim(0, 110000) +
+  ylim(0,.2)+
   geom_text_repel(
     aes(label = Estimator),
     data = end_values, color = col2,
@@ -176,16 +182,16 @@ ggsave("code/figures/rmse_experiment2.pdf", height = 4, width = 4)
 
 # Plot Experiment 3 ------------------------------------------------------------
 rmse_table %>%
-  #dplyr::select(-adjusted_ht_1,-ps_rf1_1,-ps_logit1_1) %>%
+  dplyr::select(-adjusted_ht_1,-ps_rf1_1,-ps_logit1_1) %>%
   dplyr::filter(Exp == 3) %>%
   dplyr::select(-X, -Exp) %>%
   melt(id.vars = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
                                                        "ps1_1" = "PS Matching (True)",
-                                                       "ps_rf1_1" = "DRRF",
-                                                       "ps_logit1_1" = "DRRF CF",
-                                                       "adjusted_ht_1" = "HT RF",
+                                                       "dr_RF_Pscore_1" = "DRRF",
+                                                       "dr_RF_Pscore_CF_1" = "DRRF CF",
+                                                       "dr_noCF_1" = "HT RF",
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
@@ -197,16 +203,16 @@ rmse_table %>%
 rmse_table %>%
   filter(Exp == 3) %>%
   dplyr::filter(N > 100) %>%
-  #dplyr::select(-adjusted_ht_1,-ps_rf1_1,-ps_logit1_1) %>%
+  dplyr::select(-adjusted_ht_1,-ps_rf1_1,-ps_logit1_1) %>%
   dplyr::select(-Exp, -X) %>%
-  dplyr::select(N,nn1_1, lr_1,rf_1,dr_logit_1,ht_1,loop_rf_1,ps1_1,cross_fit_1,adjusted_ht_1,ps_rf1_1,ps_logit1_1) %>%
+  dplyr::select(N,nn1_1, lr_1,rf_1,dr_logit_1,ht_1,loop_rf_1,ps1_1,cross_fit_1,dr_noCF_1,dr_RF_Pscore_1,dr_RF_Pscore_CF_1) %>%
   melt(id = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
                                                        "ps1_1" = "PS Matching (True)",
-                                                       "ps_rf1_1" = "DRRF",
-                                                       "ps_logit1_1" = "DRRF CF",
-                                                       "adjusted_ht_1" = "HT RF",
+                                                       "dr_RF_Pscore_1" = "DRRF",
+                                                       "dr_RF_Pscore_CF_1" = "DRRF CF",
+                                                       "dr_noCF_1" = "HT RF",
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",
@@ -241,16 +247,16 @@ ggsave("code/figures/rmse_experiment3.pdf", height = 4, width = 4)
 rmse_table %>%
   filter(Exp == 3) %>%
   dplyr::filter(N > 100) %>%
-  #dplyr::select(-adjusted_ht_1,-ps_rf1_1,-ps_logit1_1) %>%
+  dplyr::select(-adjusted_ht_1,-ps_rf1_1,-ps_logit1_1) %>%
   dplyr::select(-Exp, -X) %>%
-  dplyr::select(N,nn1_1, lr_1,rf_1,dr_logit_1,ps_rf1_1,ps_logit1_1,ht_1,loop_rf_1,ps1_1,cross_fit_1,adjusted_ht_1) %>%
+  dplyr::select(N,nn1_1, lr_1,rf_1,dr_logit_1,dr_RF_Pscore_1,dr_RF_Pscore_CF_1,ht_1,loop_rf_1,ps1_1,cross_fit_1,dr_noCF_1) %>%
   melt(id = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
                                                        "ps1_1" = "PS Matching (True)",
-                                                       "ps_rf1_1" = "DRRF",
-                                                       "ps_logit1_1" = "DRRF CF",
-                                                       "adjusted_ht_1" = "HT RF",
+                                                       "dr_RF_Pscore_1" = "DRRF",
+                                                       "dr_RF_Pscore_CF_1" = "DRRF CF",
+                                                       "dr_noCF_1" = "HT RF",
                                                        "lr_1" = "Logistic",
                                                        "rf_1" = "RF",
                                                        "loop_rf_1" = "LOO RF ",

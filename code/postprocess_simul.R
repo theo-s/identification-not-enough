@@ -12,6 +12,14 @@ for (file in dir("code/results")) {
   }
 }
 
+for (file in dir("code/res_new")) {
+  print(file)
+  if (substr(file, 1,5) == "final") {
+    data <- readRDS(paste0("code/res_new/",file))
+    all_data <- rbind(all_data, data)
+  }
+}
+
 all_data %>%
   filter(N %in% c(1e3,1e4,1e5)) -> all_data
 
@@ -47,7 +55,7 @@ all_data %>%
   group_by(N,Exp) %>%
   summarise(across(everything(), list(mean))) -> mse_table
 
-write.csv(mse_table, file = "code/newMSEtable.csv")
+write.csv(mse_table, file = "code/finalMSEtable.csv")
 
 
 # Get variance -----------------------------------------------------------------
