@@ -166,7 +166,7 @@ rmse_table %>%
   scale_linetype_manual(values = linetypes)+
   scale_color_manual(values = colors)+
   xlim(0, 110000) +
-  ylim(0,.2)+
+  ylim(0,.72)+
   geom_text_repel(
     aes(label = Estimator),
     data = end_values, color = col2,
