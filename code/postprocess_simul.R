@@ -12,10 +12,10 @@ for (file in dir("code/results")) {
   }
 }
 
-for (file in dir("code/res_new")) {
+for (file in dir("code/res_newer")) {
   print(file)
   if (substr(file, 1,5) == "final") {
-    data <- readRDS(paste0("code/res_new/",file))
+    data <- readRDS(paste0("code/res_newer/",file))
     all_data <- rbind(all_data, data)
   }
 }
