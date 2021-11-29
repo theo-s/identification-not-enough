@@ -2,6 +2,59 @@
 
 # Estimators -------------------------------------------------------------------
 
+# TMLE Methods -----------------------------------------------------------------
+tmle_sl <- function(
+  X_train,
+  Tr_train,
+  Y_train,
+  p_scores,
+  M = 1
+) {
+  library(tmle)
+  library(hal9001)
+
+  # Add check for 1 dimensional case
+  if (!is.data.frame(X_train)) {
+    X_train = data.frame(V1 = X_train)
+  }
+
+  es <- tmle(Y = Y_train,
+             W = X_train,
+             A = Tr_train,
+             g.SL.library = c("SL.glm", "SL.gam","SL.hal9001"),
+             g.Delta.SL.library = c("SL.glm", "SL.gam","SL.hal9001"),
+             Q.SL.library = c("SL.glm", "SL.gam","SL.hal9001")
+  )
+
+  return(es$estimates$ATE$psi)
+}
+
+tmle_hal <- function(
+  X_train,
+  Tr_train,
+  Y_train,
+  p_scores,
+  M = 1
+) {
+  library(tmle)
+  library(hal9001)
+
+  # Add check for 1 dimensional case
+  if (!is.data.frame(X_train)) {
+    X_train = data.frame(V1 = X_train)
+  }
+
+  es <- tmle(Y = Y_train,
+             W = X_train,
+             A = Tr_train,
+             g.SL.library = "SL.hal9001",
+             g.Delta.SL.library = "SL.hal9001",
+             Q.SL.library = "SL.hal9001")
+
+  return(es$estimates$ATE$psi)
+}
+
+
 ht <- function(
   X_train,
   Tr_train,
@@ -435,30 +488,41 @@ run_sim <- function(
 
   results <- list()
 
-  results[["dr_logit"]] <- try(dr_logit(X_train = X,
+  results[["tmle"]] <- try(tmle_sl(X_train = X,
+                                   Y_train = Y,
+                                   Tr_train = Tr,
+                                   p_scores = p_scores))
+
+  results[["tmle_hal"]] <- try(tmle_hal(X_train = X,
                                         Y_train = Y,
                                         Tr_train = Tr,
                                         p_scores = p_scores))
 
-  results[["cross_fit"]] <- try(cross_fit(X_train = X,
-                                          Y_train = Y,
-                                          Tr_train = Tr,
-                                          p_scores = p_scores))
 
-  results[["dr_RF_Pscore_CF"]] <- try(dr_RF_Pscore_CF(X_train = X,
-                                                      Y_train = Y,
-                                                      Tr_train = Tr,
-                                                      p_scores = p_scores))
-
-  results[["dr_RF_Pscore"]] <- try(dr_RF_Pscore(X_train = X,
-                                        Y_train = Y,
-                                        Tr_train = Tr,
-                                        p_scores = p_scores))
-
-  results[["dr_noCF"]] <- try(dr_noCF(X_train = X,
-                                        Y_train = Y,
-                                        Tr_train = Tr,
-                                        p_scores = p_scores))
+  # results[["dr_logit"]] <- try(dr_logit(X_train = X,
+  #                                       Y_train = Y,
+  #                                       Tr_train = Tr,
+  #                                       p_scores = p_scores))
+  #
+  # results[["cross_fit"]] <- try(cross_fit(X_train = X,
+  #                                         Y_train = Y,
+  #                                         Tr_train = Tr,
+  #                                         p_scores = p_scores))
+  #
+  # results[["dr_RF_Pscore_CF"]] <- try(dr_RF_Pscore_CF(X_train = X,
+  #                                                     Y_train = Y,
+  #                                                     Tr_train = Tr,
+  #                                                     p_scores = p_scores))
+  #
+  # results[["dr_RF_Pscore"]] <- try(dr_RF_Pscore(X_train = X,
+  #                                       Y_train = Y,
+  #                                       Tr_train = Tr,
+  #                                       p_scores = p_scores))
+  #
+  # results[["dr_noCF"]] <- try(dr_noCF(X_train = X,
+  #                                       Y_train = Y,
+  #                                       Tr_train = Tr,
+  #                                       p_scores = p_scores))
 
 
   # results[["ht"]] <- try(ht(X_train = X,
