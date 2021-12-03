@@ -20,6 +20,14 @@ for (file in dir("code/res_newer")) {
   }
 }
 
+for (file in dir("code/results_tmle")) {
+  print(file)
+  if (substr(file, 1,3) == "new") {
+    data <- readRDS(paste0("code/results_tmle/",file))
+    all_data <- rbind(all_data, data)
+  }
+}
+
 all_data %>%
   filter(N %in% c(1e3,1e4,1e5)) -> all_data
 
@@ -27,6 +35,15 @@ all_data %>%
 all_data$TrueATE <- ifelse(all_data$Exp==1,.5861,
                            ifelse(all_data$Exp==2, .32346, .5))
 
+
+all_data %>%
+  dplyr::mutate(across(-c(1,2), ~  . - TrueATE)) %>%
+  dplyr::mutate(across(-c(1,2), ~  . **2)) %>%
+  dplyr::select(-TrueATE) %>%
+  group_by(N,Exp) %>%
+  summarise(across(everything(), list(mean))) -> mse_table
+
+write.csv(mse_table, file = "code/tmleMSEtable.csv")
 
 # For some reason RF failed on one run of experiments, exclude these for now ---
 # all_data[rowSums(is.na(all_data)) > 0,]

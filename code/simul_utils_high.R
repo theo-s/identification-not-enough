@@ -9,7 +9,10 @@ tmle_sl <- function(
   M = 1
 ) {
   library(tmle)
-  library(hal9001)
+
+  if (length(unique(Y_train[Tr_train == 1])) == 1) {
+    return(mean(Y_train[Tr_train == 1]))
+  }
 
   # Add check for 1 dimensional case
   if (!is.data.frame(X_train)) {
@@ -19,9 +22,9 @@ tmle_sl <- function(
   es <- tmle(Y = Y_train,
              W = X_train,
              A = Tr_train,
-             g.SL.library = c("SL.glm", "SL.gam","SL.hal9001"),
-             g.Delta.SL.library = c("SL.glm", "SL.gam","SL.hal9001"),
-             Q.SL.library = c("SL.glm", "SL.gam","SL.hal9001")
+             g.SL.library = c("SL.glm", "SL.gam","SL.glmnet","SL.xgboost"),
+             g.Delta.SL.library = c("SL.glm", "SL.gam","SL.glmnet","SL.xgboost"),
+             Q.SL.library = c("SL.glm", "SL.gam","SL.glmnet","SL.xgboost")
              )
 
   return(es$estimates$ATE$psi)
@@ -36,6 +39,11 @@ tmle_hal <- function(
 ) {
   library(tmle)
   library(hal9001)
+
+
+  if (length(unique(Y_train[Tr_train == 1])) == 1) {
+    return(mean(Y_train[Tr_train == 1]))
+  }
 
   # Add check for 1 dimensional case
   if (!is.data.frame(X_train)) {
@@ -78,10 +86,15 @@ lasso <- function(
   p_scores
 ) {
 
-  model <- cv.glmnet(x = X_train[Tr_train == 1,],
+  X_train <- data.frame(X_train)
+
+  if (length(unique(Y_train[Tr_train == 1])) == 1) {
+    return(mean(Y_train[Tr_train == 1]))
+  }
+  model <- cv.glmnet(x = as.matrix(X_train[Tr_train == 1,]),
                      y = Y_train[Tr_train == 1])
 
-  pred_cate <- predict(model, newx = X_train[Tr_train == 1,], s = "lambda.min")
+  pred_cate <- predict(model, newx = as.matrix(X_train[Tr_train == 1,]), s = "lambda.min")
 
   return(mean(pred_cate))
 }
@@ -94,15 +107,21 @@ dr_lasso <- function(
   p_scores
 ) {
   library(glmnet)
+  X_train <- data.frame(X_train)
 
   data <- X_train
   y <- Y_train
   tr <- Tr_train
 
-  fit_1 <- cv.glmnet(x = data,
-                     y = y)
+  if (length(unique(y)) == 1) {
+    y_pred <- rep(mean(y),nrow(data))
+  } else {
+    fit_1 <- cv.glmnet(x = as.matrix(data),
+                       y = y)
+    y_pred <- predict(fit_1, newx = as.matrix(data), s = "lambda.min")
+  }
 
-  y_pred <- predict(fit_1, newx = data, s = "lambda.min")
+
 
   fit <- glm(Tr_train ~.,
              data = data.frame(X_train,
@@ -131,6 +150,8 @@ dr_lasso_cf <- function(
   sample_1 <- sample(1:nrow(X_train), size = round(.5*nrow(X_train)), replace = FALSE)
   sample_2 <- (1:nrow(X_train))[!(1:nrow(X_train) %in% sample_1)]
 
+  X_train <- data.frame(X_train)
+
   data_1 <- X_train[sample_1,]
   data_2 <- X_train[sample_2,]
 
@@ -140,14 +161,19 @@ dr_lasso_cf <- function(
   tr_1 <- Tr_train[sample_1]
   tr_2 <- Tr_train[sample_2]
 
-  fit_1 <- cv.glmnet(x = data_1,
-                     y = y_1)
 
-  fit_2 <- cv.glmnet(x = data_2,
-                     y = y_2)
+  if (length(unique(y_1)) == 1 || length(unique(y_2)) == 1) {
+    y_pred_1 <- rep(mean(y_1),nrow(data_1))
+    y_pred_2 <- rep(mean(y_2),nrow(data_2))
+  } else {
+    fit_1 <- cv.glmnet(x = as.matrix(data_1),
+                       y = y_1)
+    fit_2 <- cv.glmnet(x = as.matrix(data_2),
+                       y = y_2)
 
-  y_pred_1 <- predict(fit_2, newx = data_1, s = "lambda.min")
-  y_pred_2 <- predict(fit_1, newx = data_2, s = "lambda.min")
+    y_pred_1 <- predict(fit_2, newx = as.matrix(data_1), s = "lambda.min")
+    y_pred_2 <- predict(fit_1, newx = as.matrix(data_2), s = "lambda.min")
+  }
 
   # Estimate P Scores
   pfit_1 <- glm(Tr_train ~.,
@@ -190,16 +216,21 @@ ht_lasso <- function(
 ) {
   library(glmnet)
 
+  X_train <- data.frame(X_train)
+
   data <- X_train
   y <- Y_train
   tr <- Tr_train
   p <- p_scores
 
+  if (length(unique(y)) == 1) {
+    y_pred <- rep(mean(y),nrow(data))
+  } else {
+    fit_1 <- cv.glmnet(x = as.matrix(data),
+                       y = y)
+    y_pred <- predict(fit_1, newx = as.matrix(data), s = "lambda.min")
+  }
 
-  fit_1 <- cv.glmnet(x = data,
-                     y = y)
-
-  y_pred <- predict(fit_1, newx = data, s = "lambda.min")
 
   ate <- mean((y-y_pred)*tr/p + y_pred)
   return(ate)
@@ -213,6 +244,8 @@ ht_lasso_cf <- function(
   p_scores
 ) {
   library(glmnet)
+  X_train <- data.frame(X_train)
+
   sample_1 <- sample(1:nrow(X_train), size = round(.5*nrow(X_train)), replace = FALSE)
   sample_2 <- (1:nrow(X_train))[!(1:nrow(X_train) %in% sample_1)]
 
@@ -228,14 +261,20 @@ ht_lasso_cf <- function(
   p_1 <- p_scores[sample_1]
   p_2 <- p_scores[sample_2]
 
-  fit_1 <- cv.glmnet(x = data_1,
-                     y = y_1)
 
-  fit_2 <- cv.glmnet(x = data_2,
-                     y = y_2)
 
-  y_pred_1 <- predict(fit_2, newx = data_1, s = "lambda.min")
-  y_pred_2 <- predict(fit_1, newx = data_2, s = "lambda.min")
+  if (length(unique(y_1)) == 1 || length(unique(y_2)) == 1) {
+    y_pred_1 <- rep(mean(y_1),nrow(data_1))
+    y_pred_2 <- rep(mean(y_2),nrow(data_2))
+  } else {
+    fit_1 <- cv.glmnet(x = as.matrix(data_1),
+                       y = y_1)
+    fit_2 <- cv.glmnet(x = as.matrix(data_2),
+                       y = y_2)
+
+    y_pred_1 <- predict(fit_2, newx = as.matrix(data_1), s = "lambda.min")
+    y_pred_2 <- predict(fit_1, newx = as.matrix(data_2), s = "lambda.min")
+  }
 
   ate_1 <- mean((y_1-y_pred_1)*tr_1/p_1 + y_pred_1)
   ate_2 <- mean((y_2-y_pred_2)*tr_2/p_2 + y_pred_2)
@@ -300,6 +339,7 @@ run_sim <- function(
   set.seed(seed)
 
   X <- matrix(runif(n*k), ncol = k)
+  X <- data.frame(X)
   p_scores <- p_score(x = X, p = p, seed = seed)
   Tr <- sapply(p_scores, function(x){return(rbinom(1,1,prob=x))})
   outcome <- mu_1(x = X, p = p, seed = seed)
@@ -307,15 +347,10 @@ run_sim <- function(
 
   results <- list()
 
-  results[["tmle"]] <- try(tmle(X_train = X,
-                              Y_train = Y,
-                              Tr_train = Tr,
-                              p_scores = p_scores))
-
-  results[["tmle_hal"]] <- try(tmle_hal(X_train = X,
-                                 Y_train = Y,
-                                 Tr_train = Tr,
-                                 p_scores = p_scores))
+  results[["tmle"]] <- try(tmle_sl(X_train = X,
+                            Y_train = Y,
+                            Tr_train = Tr,
+                            p_scores = p_scores))
 
   results[["nn_matching"]] <- try(nn_matching(X_train = X,
                                      Y_train = Y,

@@ -23,16 +23,17 @@ if (!interactive()){
 # based on a logistic regression model with the coefficients coming from IID
 # rademacher random variables on P percent of the features
 ps <- function(x, p, seed=1) {
-  # Make p in (0,1)
-  set.seed(seed)
-  p <- max(min(p,1), .1)
-
-  # Get radamacher RV's for coefficients for P percent, pad rest with 0
-  coefs <- 2*rbinom(round(p*ncol(x)), 1, .5)-1
-  coefs <- c(coefs, rep(0,ncol(x)-round(p*ncol(x))))
+  # Pad coefficients with zeros
+  coefs <- readRDS("code/coefs.RDS")
+  current_coefs <- coefs[1:ncol(x)]
+  if (p == 0) {
+    current_coefs <- rep(0, ncol(x))
+  } else {
+    current_coefs <- c(current_coefs[1:round(p*ncol(x))], rep(0,ncol(x)-round(p*ncol(x))))
+  }
 
   # Get p scores with logistic transform
-  probs <-  as.matrix(x) %*% coefs
+  probs <-  as.matrix(x) %*% current_coefs
   logit <- function(x){return(exp(x)/(1+exp(x)))}
   probs <- sapply(probs, logit)
 
@@ -44,16 +45,19 @@ ps <- function(x, p, seed=1) {
 
 # Logistic Potential Outcomes
 logistic <- function(x, p, seed=1) {
-  # Make p in (0,1)
-  set.seed(seed)
-  p <- max(min(p,1), .1)
+  # Pad coefficients with zeros
+  coefs <- readRDS("code/coefs.RDS")
+  current_coefs <- coefs[1:ncol(x)]
 
-  # Get radamacher RV's for coefficients for P percent, pad rest with 0
-  coefs <- 2*rbinom(round(p*ncol(x)), 1, .5)-1
-  coefs <- c(coefs, rep(0,ncol(x)-round(p*ncol(x))))
+  if (p == 0) {
+    current_coefs <- rep(0, ncol(x))
+  } else {
+    current_coefs <- c(current_coefs[1:round(p*ncol(x))], rep(0,ncol(x)-round(p*ncol(x))))
+    current_coefs <- current_coefs *(1/sqrt(nrow(x)))
+  }
 
   # Get p scores with logistic transform
-  probs <-  as.matrix(x) %*% coefs
+  probs <-  as.matrix(x) %*% current_coefs
   logit <- function(x){return(exp(x)/(1+exp(x)))}
   probs <- sapply(probs, logit)
 
@@ -67,35 +71,40 @@ logistic <- function(x, p, seed=1) {
 
 # Linear Potential Outcomes
 linear <- function(x, p, seed=1) {
-  # Make p in (0,1)
-  set.seed(seed)
-  p <- max(min(p,1), .1)
-
-  # Get radamacher RV's for coefficients for P percent, pad rest with 0
-  coefs <- 2*rbinom(round(p*ncol(x)), 1, .5)-1
-  coefs <- c(coefs, rep(0,ncol(x)-round(p*ncol(x))))
+  # Pad coefficients with zeros
+  coefs <- readRDS("code/coefs.RDS")
+  current_coefs <- coefs[1:ncol(x)]
+  if (p == 0) {
+    current_coefs <- rep(0, ncol(x))
+  } else {
+    current_coefs <- c(current_coefs[1:round(p*ncol(x))], rep(0,ncol(x)-round(p*ncol(x))))
+    current_coefs <- current_coefs *(1/sqrt(nrow(x)))
+  }
 
   # Get p scores with logistic transform
-  outcomes <-  as.matrix(x) %*% coefs
+  outcomes <-  as.matrix(x) %*% current_coefs
 
   return(outcomes)
 }
 
 # Truncated Linear Potential Outcomes
 truncated_linear <- function(x, p, seed=1) {
-  # Make p in (0,1)
-  set.seed(seed)
-  p <- max(min(p,1), .1)
-
-  # Get radamacher RV's for coefficients for P percent, pad rest with 0
-  coefs <- 2*rbinom(round(p*ncol(x)), 1, .5)-1
-  coefs <- c(coefs, rep(0,ncol(x)-round(p*ncol(x))))
+  # Pad coefficients with zeros
+  coefs <- readRDS("code/coefs.RDS")
+  current_coefs <- coefs[1:ncol(x)]
+  if (p == 0) {
+    current_coefs <- rep(0, ncol(x))
+  } else {
+    current_coefs <- c(current_coefs[1:round(p*ncol(x))], rep(0,ncol(x)-round(p*ncol(x))))
+    current_coefs <- current_coefs *(1/sqrt(nrow(x)))
+  }
 
   # Get p scores with logistic transform
-  outcomes <-  as.matrix(x) %*% coefs
+  outcomes <-  as.matrix(x) %*% current_coefs
 
+  quants <- unname(quantile(outcomes, probs = c(.2,.8)))
   # Truncate Outcomes at +-1
-  outcomes <-  min(max(outcomes,-1), 1)
+  outcomes <- ifelse(outcomes < quants[1],quants[1],ifelse(outcomes > quants[2],quants[2], outcomes))
 
   return(outcomes)
 }
@@ -106,7 +115,6 @@ res <- data.frame(N = NA,
                   P = NA,
                   Exp = NA,
                   tmle = NA,
-                  tmle_hal = NA,
                   nn_matching = NA,
                   lasso = NA,
                   dr_lasso = NA,
@@ -116,10 +124,9 @@ res <- data.frame(N = NA,
                   ht = NA,
                   ps_matching_true = NA)
 
-
-  for (n in c(100, 1000)) {
-    for (k in c(round(.1*n), n, 10*n, 100*n)) {
-      for (p in c(0,.1,.5,.9)) {
+for (n in c(100,1000,10000)) {
+    for (k in c(round(.1*n), n, 10*n)) {
+      for (p in c(.1,.5,.9)) {
 
         experiment_1 <- run_sim(p_score = ps,
                                 mu_1 = linear,
@@ -128,12 +135,12 @@ res <- data.frame(N = NA,
                                 p=p,
                                 seed=seed)
 
+
         res <- rbind(res, c(n,
                             k,
                             p,
                             1,
                             experiment_1$tmle,
-                            experiment_1$tmle_hal,
                             experiment_1$nn_matching,
                             experiment_1$lasso,
                             experiment_1$dr_lasso,
@@ -156,7 +163,6 @@ res <- data.frame(N = NA,
                             p,
                             2,
                             experiment_2$tmle,
-                            experiment_2$tmle_hal,
                             experiment_2$nn_matching,
                             experiment_2$lasso,
                             experiment_2$dr_lasso,
@@ -179,7 +185,6 @@ res <- data.frame(N = NA,
                             p,
                             3,
                             experiment_3$tmle,
-                            experiment_3$tmle_hal,
                             experiment_3$nn_matching,
                             experiment_3$lasso,
                             experiment_3$dr_lasso,
