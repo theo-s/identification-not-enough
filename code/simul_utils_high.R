@@ -60,6 +60,58 @@ tmle_hal <- function(
   return(es$estimates$ATE$psi)
 }
 
+tmle_c <- function(
+  X_train,
+  Tr_train,
+  Y_train,
+  p_scores,
+  M = 1
+) {
+  library(ctmle)
+
+
+  if (length(unique(Y_train[Tr_train == 1])) == 1) {
+    return(mean(Y_train[Tr_train == 1]))
+  }
+
+  # Add check for 1 dimensional case
+  if (!is.data.frame(X_train)) {
+    X_train = data.frame(V1 = X_train)
+  }
+
+  SL.library = c("SL.glm", "SL.gam","SL.glmnet","SL.xgboost")
+
+  N <- nrow(X_train)
+  V <- 5
+
+  # Initialize Q
+  Q <- cbind(rep(mean(Y_train[Tr_train == 0]), N),
+             rep(mean(Y_train[Tr_train == 1]), N))
+
+  # Make folds
+  folds <-by(sample(1:N,N), rep(1:V, length=N), list)
+
+  # Get estimate sequence with superlearner
+  gn_seq <- build_gn_seq(A = Tr_train,
+                         W = X_train,
+                         SL.library = SL.library,
+                         folds = folds)
+
+
+  es <- ctmleGeneral(Y = Y_train,
+                     W = X_train,
+                     A = Tr_train,
+                     Q = Q,
+                     ctmletype = 1,
+                     gn_candidates = gn_seq$gn_candidates,
+                     gn_candidates_cv = gn_seq$gn_candidates_cv,
+                     folds = folds,
+                     V = 5
+                     )
+
+  return(es$est)
+}
+
 # NO P Score -------------------------------------------------------------------
 nn_matching <- function(
   X_train,

@@ -53,7 +53,6 @@ logistic <- function(x, p, seed=1) {
     current_coefs <- rep(0, ncol(x))
   } else {
     current_coefs <- c(current_coefs[1:round(p*ncol(x))], rep(0,ncol(x)-round(p*ncol(x))))
-    current_coefs <- current_coefs *(1/sqrt(nrow(x)))
   }
 
   # Get p scores with logistic transform
@@ -78,7 +77,6 @@ linear <- function(x, p, seed=1) {
     current_coefs <- rep(0, ncol(x))
   } else {
     current_coefs <- c(current_coefs[1:round(p*ncol(x))], rep(0,ncol(x)-round(p*ncol(x))))
-    current_coefs <- current_coefs *(1/sqrt(nrow(x)))
   }
 
   # Get p scores with logistic transform
@@ -96,7 +94,6 @@ truncated_linear <- function(x, p, seed=1) {
     current_coefs <- rep(0, ncol(x))
   } else {
     current_coefs <- c(current_coefs[1:round(p*ncol(x))], rep(0,ncol(x)-round(p*ncol(x))))
-    current_coefs <- current_coefs *(1/sqrt(nrow(x)))
   }
 
   # Get p scores with logistic transform
@@ -104,7 +101,9 @@ truncated_linear <- function(x, p, seed=1) {
 
   quants <- unname(quantile(outcomes, probs = c(.2,.8)))
   # Truncate Outcomes at +-1
-  outcomes <- ifelse(outcomes < quants[1],quants[1],ifelse(outcomes > quants[2],quants[2], outcomes))
+  outcomes <- ifelse(outcomes < quants[1], quants[1],
+                     ifelse(outcomes > quants[2], quants[2],
+                            outcomes))
 
   return(outcomes)
 }

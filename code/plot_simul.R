@@ -21,7 +21,9 @@ linetypes <- c("NN Matching" = "dotted",
                "LOO RF " = "solid",
                "PS Matching (True)" = "solid",
                "CF RF" = "solid",
-               "HT RF" = "solid"
+               "HT RF" = "solid",
+               "TMLE SL" = "solid",
+               "TMLE HAL" = "solid"
 )
 
 # scales::show_col(safe_colorblind_palette)
@@ -35,7 +37,9 @@ colors <- c("NN Matching" = "#88CCEE",
             "LOO RF " = "#332288",
             "PS Matching (True)" = "#CC6677",
             "CF RF" = "#117733",
-            "HT RF" = "#661100"
+            "HT RF" = "#661100",
+            "TMLE SL" = "#661100",
+            "TMLE HAL" = "#661100"
 )
 
 col2 <- c("#88CCEE",
@@ -48,6 +52,8 @@ col2 <- c("#88CCEE",
           "#117733",
           "#DDCC77",
           "#888888",
+          "#661100",
+          "#661100",
           "#661100")
 
 # Plot sqrt(var) --------------------------------------------------------------------
@@ -63,7 +69,11 @@ final_mse_table <- read.csv(file = "code/finalMSEtable.csv")
 final_rmse_table <- final_mse_table
 final_rmse_table[,-c(1:3)] <- sqrt(final_rmse_table[,-c(1:3)])
 
-rmse_table <- cbind(rmse_table, new_rmse_table[,c(4,5)], final_rmse_table[,c(5,6,8)])
+tmle_mse_table <- read.csv(file = "code/tmleMSEtable.csv")
+tmle_rmse_table <- tmle_mse_table
+tmle_rmse_table[,-c(1:3)] <- sqrt(tmle_rmse_table[,-c(1:3)])
+
+rmse_table <- cbind(rmse_table, new_rmse_table[,c(4,5)], final_rmse_table[,c(5,6,8)],tmle_rmse_table[,c(4,5)])
 
 # Plot Experiment 1 ------------------------------------------------------------
 rmse_table %>%
@@ -82,7 +92,9 @@ rmse_table %>%
                                                        "loop_rf_1" = "LOO RF ",
                                                        "cross_fit_1" = "CF RF",
                                                        "dr_logit_1" = "DR Logit",
-                                                       "ht_1" = "Horvitz-Thompson"))) %>%
+                                                       "ht_1" = "Horvitz-Thompson",
+                                                       "tmle_1" ="TMLE SL",
+                                                       "tmle_hal_1" = "TMLE HAL"))) %>%
   dplyr::filter(N == 1e5) -> end_values
 
 rmse_table %>%
@@ -90,7 +102,7 @@ rmse_table %>%
   dplyr::filter(N > 100) %>%
   dplyr::select(-adjusted_ht_1,-ps_rf1_1,-ps_logit1_1) %>%
   dplyr::select(-Exp, -X) %>%
-  dplyr::select(N,nn1_1, lr_1,rf_1,dr_logit_1,ht_1,loop_rf_1,ps1_1,cross_fit_1,dr_noCF_1,dr_RF_Pscore_1,dr_RF_Pscore_CF_1) %>%
+  dplyr::select(N,nn1_1, lr_1,rf_1,dr_logit_1,ht_1,loop_rf_1,ps1_1,cross_fit_1,dr_noCF_1,dr_RF_Pscore_1,dr_RF_Pscore_CF_1,tmle_1,tmle_hal_1) %>%
   melt(id = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
@@ -103,7 +115,9 @@ rmse_table %>%
                                                        "loop_rf_1" = "LOO RF ",
                                                        "cross_fit_1" = "CF RF",
                                                        "dr_logit_1" = "DR Logit",
-                                                       "ht_1" = "Horvitz-Thompson"))) %>%
+                                                       "ht_1" = "Horvitz-Thompson",
+                                                       "tmle_1" ="TMLE SL",
+                                                       "tmle_hal_1" = "TMLE HAL"))) %>%
   ggplot(aes(x = N, y = value, color = Estimator, linetype = Estimator))+
   geom_line(show.legend = FALSE)+
   scale_linetype_manual(values = linetypes)+
@@ -139,7 +153,9 @@ rmse_table %>%
                                                        "loop_rf_1" = "LOO RF ",
                                                        "cross_fit_1" = "CF RF",
                                                        "dr_logit_1" = "DR Logit",
-                                                       "ht_1" = "Horvitz-Thompson"))) %>%
+                                                       "ht_1" = "Horvitz-Thompson",
+                                                       "tmle_1" ="TMLE SL",
+                                                       "tmle_hal_1" = "TMLE HAL"))) %>%
   dplyr::filter(N == 1e5) -> end_values
 
 rmse_table %>%
@@ -160,7 +176,9 @@ rmse_table %>%
                                                        "loop_rf_1" = "LOO RF ",
                                                        "cross_fit_1" = "CF RF",
                                                        "dr_logit_1" = "DR Logit",
-                                                       "ht_1" = "Horvitz-Thompson"))) %>%
+                                                       "ht_1" = "Horvitz-Thompson",
+                                                       "tmle_1" ="TMLE SL",
+                                                       "tmle_hal_1" = "TMLE HAL"))) %>%
   ggplot(aes(x = N, y = value, color = Estimator, linetype = Estimator))+
   geom_line(show.legend = FALSE)+
   scale_linetype_manual(values = linetypes)+
@@ -197,7 +215,9 @@ rmse_table %>%
                                                        "loop_rf_1" = "LOO RF ",
                                                        "cross_fit_1" = "CF RF",
                                                        "dr_logit_1" = "DR Logit",
-                                                       "ht_1" = "Horvitz-Thompson"))) %>%
+                                                       "ht_1" = "Horvitz-Thompson",
+                                                       "tmle_1" ="TMLE SL",
+                                                       "tmle_hal_1" = "TMLE HAL"))) %>%
   dplyr::filter(N == 1e5) -> end_values
 
 rmse_table %>%
@@ -205,7 +225,7 @@ rmse_table %>%
   dplyr::filter(N > 100) %>%
   dplyr::select(-adjusted_ht_1,-ps_rf1_1,-ps_logit1_1) %>%
   dplyr::select(-Exp, -X) %>%
-  dplyr::select(N,nn1_1, lr_1,rf_1,dr_logit_1,ht_1,loop_rf_1,ps1_1,cross_fit_1,dr_noCF_1,dr_RF_Pscore_1,dr_RF_Pscore_CF_1) %>%
+  dplyr::select(N,nn1_1, lr_1,rf_1,dr_logit_1,ht_1,loop_rf_1,ps1_1,cross_fit_1,dr_noCF_1,dr_RF_Pscore_1,dr_RF_Pscore_CF_1,tmle_1,tmle_hal_1) %>%
   melt(id = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
@@ -218,7 +238,9 @@ rmse_table %>%
                                                        "loop_rf_1" = "LOO RF ",
                                                        "cross_fit_1" = "CF RF",
                                                        "dr_logit_1" = "DR Logit",
-                                                       "ht_1" = "Horvitz-Thompson"))) %>%
+                                                       "ht_1" = "Horvitz-Thompson",
+                                                       "tmle_1" ="TMLE SL",
+                                                       "tmle_hal_1" = "TMLE HAL"))) %>%
   ggplot(aes(x = N, y = value, color = Estimator, linetype = Estimator))+
   geom_line(show.legend = FALSE)+
   scale_linetype_manual(values = linetypes)+
@@ -244,92 +266,94 @@ rmse_table %>%
 ggsave("code/figures/rmse_experiment3.pdf", height = 4, width = 4)
 
 # Plot the legend ==============================================================
-rmse_table %>%
-  filter(Exp == 3) %>%
-  dplyr::filter(N > 100) %>%
-  dplyr::select(-adjusted_ht_1,-ps_rf1_1,-ps_logit1_1) %>%
-  dplyr::select(-Exp, -X) %>%
-  dplyr::select(N,nn1_1, lr_1,rf_1,dr_logit_1,dr_RF_Pscore_1,dr_RF_Pscore_CF_1,ht_1,loop_rf_1,ps1_1,cross_fit_1,dr_noCF_1) %>%
-  melt(id = "N") %>%
-  dplyr::rename(Estimator = variable) %>%
-  dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
-                                                       "ps1_1" = "PS Matching (True)",
-                                                       "dr_RF_Pscore_1" = "DRRF",
-                                                       "dr_RF_Pscore_CF_1" = "DRRF CF",
-                                                       "dr_noCF_1" = "HT RF",
-                                                       "lr_1" = "Logistic",
-                                                       "rf_1" = "RF",
-                                                       "loop_rf_1" = "LOO RF ",
-                                                       "cross_fit_1" = "CF RF",
-                                                       "dr_logit_1" = "DR Logit",
-                                                       "ht_1" = "Horvitz-Thompson"))) %>%
-  ggplot(aes(x = N, y = value, color = Estimator, linetype = Estimator))+
-  geom_line(show.legend = TRUE, size = 2)+
-  scale_linetype_manual(values = linetypes)+
-  scale_color_manual(values = colors)+
-  xlim(0, 110000) +
-  ylim(0,.35)+
-  geom_text_repel(
-    aes(label = Estimator, color = Estimator),
-    data = end_values, color = col2,
-    size = 2, force = 3,arrow = arrow(length = unit(0.01, "npc")),
-    direction = "both", nudge_x = 500, nudge_y = .05, point.padding = .52, max.overlaps = Inf
-  )+
-  theme_bw()+
-  theme(plot.title = element_text(hjust = 0.5))+
-  guides(colour = guide_legend(title.position = "top"))+
-  theme(legend.position = "left",
-        legend.key.height = unit(.6, 'cm'), #change legend key height
-        legend.key.width = unit(3, 'cm'),
-        legend.spacing.x = unit(.1, 'cm'),
-        legend.spacing.y = unit(.02, 'cm'),
-        legend.key.size = unit(8, 'cm'),
-        legend.title.align = .5)+
-  labs(y = "RMSE when estimating ATE", x = "Sample Size", title = "Experiment 3") -> p3
-
-legend <- cowplot::get_legend(p3)
-as_ggplot(legend)
-
-ggsave("code/figures/legend.pdf", height = 3.5, width = 2.5)
-
-
-library(kableExtra)
-library(magick)
-
-
-names <- data.frame(Estimator = c( "Nearest Neighbor Matching",
-                                   "Linear Logistic Regression",
-                                   "Random Forest",
-                                   "Double Robust Estimator using Linear Logistic Regression",
-                                   "Double Robust Estimator using Random Forest",
-                                   "Double Robust Estimator using Random Forest (cross-fitting)",
-                                   "Standard Horvitz-Thompson Estimator",
-                                   "Leave-one-out Random Forest Adjusted Horvitz-Thompson Estimator",
-                                   "Propensity Score Matching on True Propensity Score",
-                                   "Cross-fitting Horvitz-Thompson Estimator with RF for Covariate Adjustment",
-                                   "Horvitz-Thompson Estimator with RF for Covariate Adjustment"),
-                    Shorthand = c("NN Matching",
-                                  "Logistic",
-                                  "RF",
-                                  "DR Logit",
-                                  "DRRF",
-                                  "DRRF CF",
-                                  "Horvitz-Thompson",
-                                  "LOO RF",
-                                  "PS Matching (True)",
-                                  "CF RF",
-                                  "HT RF"),
-                    Line = "")
-
-names %>%
-  kbl(booktabs = TRUE) %>%
-  kable_paper("striped", full_width = F) %>%
-  column_spec(1, border_left = "2px solid black") %>%
-  column_spec(2, border_right = "2px solid black") %>%
-  column_spec(3, background = colors) %>%
-  pack_rows("No Propensity Score Used", 1, 3) %>%
-  pack_rows("Estimated Propensity Score Used", 4, 6) %>%
-  pack_rows("True Propensity Score Used", 7, 11) %>%
-  save_kable("code/figures/table.pdf",density = 1000)
+# rmse_table %>%
+#   filter(Exp == 3) %>%
+#   dplyr::filter(N > 100) %>%
+#   dplyr::select(-adjusted_ht_1,-ps_rf1_1,-ps_logit1_1) %>%
+#   dplyr::select(-Exp, -X) %>%
+#   dplyr::select(N,nn1_1, lr_1,rf_1,dr_logit_1,dr_RF_Pscore_1,dr_RF_Pscore_CF_1,ht_1,loop_rf_1,ps1_1,cross_fit_1,dr_noCF_1) %>%
+#   melt(id = "N") %>%
+#   dplyr::rename(Estimator = variable) %>%
+#   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
+#                                                        "ps1_1" = "PS Matching (True)",
+#                                                        "dr_RF_Pscore_1" = "DRRF",
+#                                                        "dr_RF_Pscore_CF_1" = "DRRF CF",
+#                                                        "dr_noCF_1" = "HT RF",
+#                                                        "lr_1" = "Logistic",
+#                                                        "rf_1" = "RF",
+#                                                        "loop_rf_1" = "LOO RF ",
+#                                                        "cross_fit_1" = "CF RF",
+#                                                        "dr_logit_1" = "DR Logit",
+#                                                        "ht_1" = "Horvitz-Thompson",
+#                                                        "tmle_1" ="TMLE SL",
+#                                                        "tmle_hal_1" = "TMLE HAL"))) %>%
+#   ggplot(aes(x = N, y = value, color = Estimator, linetype = Estimator))+
+#   geom_line(show.legend = TRUE, size = 2)+
+#   scale_linetype_manual(values = linetypes)+
+#   scale_color_manual(values = colors)+
+#   xlim(0, 110000) +
+#   ylim(0,.35)+
+#   geom_text_repel(
+#     aes(label = Estimator, color = Estimator),
+#     data = end_values, color = col2,
+#     size = 2, force = 3,arrow = arrow(length = unit(0.01, "npc")),
+#     direction = "both", nudge_x = 500, nudge_y = .05, point.padding = .52, max.overlaps = Inf
+#   )+
+#   theme_bw()+
+#   theme(plot.title = element_text(hjust = 0.5))+
+#   guides(colour = guide_legend(title.position = "top"))+
+#   theme(legend.position = "left",
+#         legend.key.height = unit(.6, 'cm'), #change legend key height
+#         legend.key.width = unit(3, 'cm'),
+#         legend.spacing.x = unit(.1, 'cm'),
+#         legend.spacing.y = unit(.02, 'cm'),
+#         legend.key.size = unit(8, 'cm'),
+#         legend.title.align = .5)+
+#   labs(y = "RMSE when estimating ATE", x = "Sample Size", title = "Experiment 3") -> p3
+#
+# legend <- cowplot::get_legend(p3)
+# as_ggplot(legend)
+#
+# ggsave("code/figures/legend.pdf", height = 3.5, width = 2.5)
+#
+#
+# library(kableExtra)
+# library(magick)
+#
+#
+# names <- data.frame(Estimator = c( "Nearest Neighbor Matching",
+#                                    "Linear Logistic Regression",
+#                                    "Random Forest",
+#                                    "Double Robust Estimator using Linear Logistic Regression",
+#                                    "Double Robust Estimator using Random Forest",
+#                                    "Double Robust Estimator using Random Forest (cross-fitting)",
+#                                    "Standard Horvitz-Thompson Estimator",
+#                                    "Leave-one-out Random Forest Adjusted Horvitz-Thompson Estimator",
+#                                    "Propensity Score Matching on True Propensity Score",
+#                                    "Cross-fitting Horvitz-Thompson Estimator with RF for Covariate Adjustment",
+#                                    "Horvitz-Thompson Estimator with RF for Covariate Adjustment"),
+#                     Shorthand = c("NN Matching",
+#                                   "Logistic",
+#                                   "RF",
+#                                   "DR Logit",
+#                                   "DRRF",
+#                                   "DRRF CF",
+#                                   "Horvitz-Thompson",
+#                                   "LOO RF",
+#                                   "PS Matching (True)",
+#                                   "CF RF",
+#                                   "HT RF"),
+#                     Line = "")
+#
+# names %>%
+#   kbl(booktabs = TRUE) %>%
+#   kable_paper("striped", full_width = F) %>%
+#   column_spec(1, border_left = "2px solid black") %>%
+#   column_spec(2, border_right = "2px solid black") %>%
+#   column_spec(3, background = colors) %>%
+#   pack_rows("No Propensity Score Used", 1, 3) %>%
+#   pack_rows("Estimated Propensity Score Used", 4, 6) %>%
+#   pack_rows("True Propensity Score Used", 7, 11) %>%
+#   save_kable("code/figures/table.pdf",density = 1000)
 
 
