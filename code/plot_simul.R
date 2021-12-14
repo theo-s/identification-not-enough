@@ -22,8 +22,9 @@ linetypes <- c("NN Matching" = "dotted",
                "PS Matching (True)" = "solid",
                "CF RF" = "solid",
                "HT RF" = "solid",
-               "TMLE SL" = "solid",
-               "TMLE HAL" = "solid"
+               "TMLE SL" = "dashed",
+               "TMLE HAL" = "dashed",
+               "CTMLE" = "dashed"
 )
 
 # scales::show_col(safe_colorblind_palette)
@@ -39,7 +40,8 @@ colors <- c("NN Matching" = "#88CCEE",
             "CF RF" = "#117733",
             "HT RF" = "#661100",
             "TMLE SL" = "#661100",
-            "TMLE HAL" = "#661100"
+            "TMLE HAL" = "#661100",
+            "CTMLE" = "#661100"
 )
 
 col2 <- c("#88CCEE",
@@ -52,6 +54,7 @@ col2 <- c("#88CCEE",
           "#117733",
           "#DDCC77",
           "#888888",
+          "#661100",
           "#661100",
           "#661100",
           "#661100")
@@ -73,7 +76,11 @@ tmle_mse_table <- read.csv(file = "code/tmleMSEtable.csv")
 tmle_rmse_table <- tmle_mse_table
 tmle_rmse_table[,-c(1:3)] <- sqrt(tmle_rmse_table[,-c(1:3)])
 
-rmse_table <- cbind(rmse_table, new_rmse_table[,c(4,5)], final_rmse_table[,c(5,6,8)],tmle_rmse_table[,c(4,5)])
+ctmle_mse_table <- read.csv(file = "code/ctmleMSEtable.csv")
+ctmle_rmse_table <- ctmle_mse_table
+ctmle_rmse_table[,-c(1:3)] <- sqrt(ctmle_rmse_table[,-c(1:3)])
+
+rmse_table <- cbind(rmse_table, new_rmse_table[,c(4,5)], final_rmse_table[,c(5,6,8)],tmle_rmse_table[,c(4,5)], ctmle = ctmle_rmse_table[,4])
 
 # Plot Experiment 1 ------------------------------------------------------------
 rmse_table %>%
@@ -94,7 +101,8 @@ rmse_table %>%
                                                        "dr_logit_1" = "DR Logit",
                                                        "ht_1" = "Horvitz-Thompson",
                                                        "tmle_1" ="TMLE SL",
-                                                       "tmle_hal_1" = "TMLE HAL"))) %>%
+                                                       "tmle_hal_1" = "TMLE HAL",
+                                                       "ctmle" = "CTMLE"))) %>%
   dplyr::filter(N == 1e5) -> end_values
 
 rmse_table %>%
@@ -102,7 +110,7 @@ rmse_table %>%
   dplyr::filter(N > 100) %>%
   dplyr::select(-adjusted_ht_1,-ps_rf1_1,-ps_logit1_1) %>%
   dplyr::select(-Exp, -X) %>%
-  dplyr::select(N,nn1_1, lr_1,rf_1,dr_logit_1,ht_1,loop_rf_1,ps1_1,cross_fit_1,dr_noCF_1,dr_RF_Pscore_1,dr_RF_Pscore_CF_1,tmle_1,tmle_hal_1) %>%
+  dplyr::select(N,nn1_1, lr_1,rf_1,dr_logit_1,ht_1,loop_rf_1,ps1_1,cross_fit_1,dr_noCF_1,dr_RF_Pscore_1,dr_RF_Pscore_CF_1,tmle_1,tmle_hal_1,ctmle) %>%
   melt(id = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
@@ -117,7 +125,8 @@ rmse_table %>%
                                                        "dr_logit_1" = "DR Logit",
                                                        "ht_1" = "Horvitz-Thompson",
                                                        "tmle_1" ="TMLE SL",
-                                                       "tmle_hal_1" = "TMLE HAL"))) %>%
+                                                       "tmle_hal_1" = "TMLE HAL",
+                                                       "ctmle" = "CTMLE"))) %>%
   ggplot(aes(x = N, y = value, color = Estimator, linetype = Estimator))+
   geom_line(show.legend = FALSE)+
   scale_linetype_manual(values = linetypes)+
@@ -134,7 +143,7 @@ rmse_table %>%
   theme(plot.title = element_text(hjust = 0.5))+
   labs(y = "RMSE when estimating ATE", x = "Sample Size", title = "Experiment 1")
 
-ggsave("code/figures/rmse_experiment1.pdf", height = 4, width = 4)
+ggsave("code/figures/ctmle_rmse_experiment1.pdf", height = 4, width = 4)
 
 # Plot Experiment 2 ------------------------------------------------------------
 rmse_table %>%
@@ -155,7 +164,8 @@ rmse_table %>%
                                                        "dr_logit_1" = "DR Logit",
                                                        "ht_1" = "Horvitz-Thompson",
                                                        "tmle_1" ="TMLE SL",
-                                                       "tmle_hal_1" = "TMLE HAL"))) %>%
+                                                       "tmle_hal_1" = "TMLE HAL",
+                                                       "ctmle" = "CTMLE"))) %>%
   dplyr::filter(N == 1e5) -> end_values
 
 rmse_table %>%
@@ -163,7 +173,7 @@ rmse_table %>%
   dplyr::filter(N > 100) %>%
   dplyr::select(-adjusted_ht_1,-ps_rf1_1,-ps_logit1_1) %>%
   dplyr::select(-Exp, -X) %>%
-  dplyr::select(N,nn1_1, lr_1,rf_1,dr_logit_1,ht_1,loop_rf_1,ps1_1,cross_fit_1,dr_noCF_1,dr_RF_Pscore_1,dr_RF_Pscore_CF_1) %>%
+  dplyr::select(N,nn1_1, lr_1,rf_1,dr_logit_1,ht_1,loop_rf_1,ps1_1,cross_fit_1,dr_noCF_1,dr_RF_Pscore_1,dr_RF_Pscore_CF_1,tmle_1,tmle_hal_1,ctmle) %>%
   melt(id = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
@@ -178,7 +188,8 @@ rmse_table %>%
                                                        "dr_logit_1" = "DR Logit",
                                                        "ht_1" = "Horvitz-Thompson",
                                                        "tmle_1" ="TMLE SL",
-                                                       "tmle_hal_1" = "TMLE HAL"))) %>%
+                                                       "tmle_hal_1" = "TMLE HAL",
+                                                       "ctmle" = "CTMLE"))) %>%
   ggplot(aes(x = N, y = value, color = Estimator, linetype = Estimator))+
   geom_line(show.legend = FALSE)+
   scale_linetype_manual(values = linetypes)+
@@ -195,7 +206,7 @@ rmse_table %>%
   theme(plot.title = element_text(hjust = 0.5))+
   labs(y = "RMSE when estimating ATE", x = "Sample Size", title = "Experiment 2")
 
-ggsave("code/figures/rmse_experiment2.pdf", height = 4, width = 4)
+ggsave("code/figures/ctmle_rmse_experiment2.pdf", height = 4, width = 4)
 
 
 # Plot Experiment 3 ------------------------------------------------------------
@@ -217,7 +228,8 @@ rmse_table %>%
                                                        "dr_logit_1" = "DR Logit",
                                                        "ht_1" = "Horvitz-Thompson",
                                                        "tmle_1" ="TMLE SL",
-                                                       "tmle_hal_1" = "TMLE HAL"))) %>%
+                                                       "tmle_hal_1" = "TMLE HAL",
+                                                       "ctmle" = "CTMLE"))) %>%
   dplyr::filter(N == 1e5) -> end_values
 
 rmse_table %>%
@@ -225,7 +237,7 @@ rmse_table %>%
   dplyr::filter(N > 100) %>%
   dplyr::select(-adjusted_ht_1,-ps_rf1_1,-ps_logit1_1) %>%
   dplyr::select(-Exp, -X) %>%
-  dplyr::select(N,nn1_1, lr_1,rf_1,dr_logit_1,ht_1,loop_rf_1,ps1_1,cross_fit_1,dr_noCF_1,dr_RF_Pscore_1,dr_RF_Pscore_CF_1,tmle_1,tmle_hal_1) %>%
+  dplyr::select(N,nn1_1, lr_1,rf_1,dr_logit_1,ht_1,loop_rf_1,ps1_1,cross_fit_1,dr_noCF_1,dr_RF_Pscore_1,dr_RF_Pscore_CF_1,tmle_1,tmle_hal_1,ctmle) %>%
   melt(id = "N") %>%
   dplyr::rename(Estimator = variable) %>%
   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
@@ -240,7 +252,8 @@ rmse_table %>%
                                                        "dr_logit_1" = "DR Logit",
                                                        "ht_1" = "Horvitz-Thompson",
                                                        "tmle_1" ="TMLE SL",
-                                                       "tmle_hal_1" = "TMLE HAL"))) %>%
+                                                       "tmle_hal_1" = "TMLE HAL",
+                                                       "ctmle" = "CTMLE"))) %>%
   ggplot(aes(x = N, y = value, color = Estimator, linetype = Estimator))+
   geom_line(show.legend = FALSE)+
   scale_linetype_manual(values = linetypes)+
@@ -263,7 +276,7 @@ rmse_table %>%
   labs(y = "RMSE when estimating ATE", x = "Sample Size", title = "Experiment 3")
 
 
-ggsave("code/figures/rmse_experiment3.pdf", height = 4, width = 4)
+ggsave("code/figures/ctmle_rmse_experiment3.pdf", height = 4, width = 4)
 
 # Plot the legend ==============================================================
 # rmse_table %>%

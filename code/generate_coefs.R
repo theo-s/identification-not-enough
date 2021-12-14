@@ -67,9 +67,9 @@ truncated_linear <- function(x, p, seed=1) {
 
 
 # Calculate the ATE for experiment 1 -------------------------------------------
-p <- c(.9)
+p <- c(.1,.5,.9)
 n <- c(1e2,1e3,1e4)
-k <- c(1000)
+k <- c(100,1000)
 ate1 <- expand.grid(p,n,k)
 ate1$ATE <- NA
 colnames(ate1) <- c("P","N","K","ATE")
@@ -82,7 +82,7 @@ for (p_i in p) {
       print(paste0(p_i," ",n_i," ",k_i))
       # Calculate ATE with monte carlo
       pulls <- c()
-      for (seed_i in 1:1000) {
+      for (seed_i in 1:100) {
         set.seed(seed_i)
 
         X <- matrix(runif(n_i*k_i), ncol = k_i)
@@ -112,7 +112,7 @@ for (p_i in p) {
       print(paste0(p_i," ",n_i," ",k_i))
       # Calculate ATE with monte carlo
       pulls <- c()
-      for (seed_i in 1:1000) {
+      for (seed_i in 1:100) {
         set.seed(seed_i)
 
         X <- matrix(runif(n_i*k_i), ncol = k_i)
@@ -141,7 +141,7 @@ for (p_i in p) {
       print(paste0(p_i," ",n_i," ",k_i))
       # Calculate ATE with monte carlo
       pulls <- c()
-      for (seed_i in 1:1000) {
+      for (seed_i in 1:100) {
         set.seed(seed_i)
 
         X <- matrix(runif(n_i*k_i), ncol = k_i)

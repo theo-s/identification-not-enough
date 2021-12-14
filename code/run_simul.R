@@ -103,10 +103,10 @@ nonlinear <- function(x) {
 
 res <- data.frame(N = NA,
                   Exp = NA,
-                  tmle = NA,
-                  tmle_hal = NA)
+                  #tmle = NA,
+                  tmle_c = NA)
 
-for (n in c(1000, 10000, 100000)) {
+for (n in c(100, 1000, 100000)) {
   experiment_1 <- run_sim(p_score = linear_ps,
                           mu_1 = linear,
                           n=n,
@@ -114,8 +114,8 @@ for (n in c(1000, 10000, 100000)) {
 
   res <- rbind(res, c(n,
                       1,
-                      experiment_1$tmle,
-                      experiment_1$tmle_hal))
+                      #experiment_1$tmle,
+                      experiment_1$tmle_c))
   print(res)
 
   experiment_2 <- run_sim(p_score = smooth_ps,
@@ -125,8 +125,8 @@ for (n in c(1000, 10000, 100000)) {
 
   res <- rbind(res, c(n,
                       2,
-                      experiment_2$tmle,
-                      experiment_2$tmle_hal))
+                      #experiment_2$tmle,
+                      experiment_2$tmle_c))
   print(res)
 
   experiment_3 <- run_sim(p_score = nonlinear_ps,
@@ -136,13 +136,13 @@ for (n in c(1000, 10000, 100000)) {
 
   res <- rbind(res, c(n,
                       3,
-                      experiment_3$tmle,
-                      experiment_3$tmle_hal))
+                      #experiment_3$tmle,
+                      experiment_3$tmle_c))
   print(res)
 }
 
-filename <- paste0("code/results_tmle/new_sim_res_",seed,".RDS")
-saveRDS(res[-1,], filename)
+#filename <- paste0("code/results_tmle/new_sim_res_",seed,".RDS")
+#saveRDS(res[-1,], filename)
 
 
 
