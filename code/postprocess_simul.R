@@ -64,6 +64,13 @@ for (file in dir("code/results_12_13")) {
   }
 }
 
+for (file in dir("code/results_exp5")) {
+  print(file)
+  if (substr(file, 1,3) == "res") {
+    data <- readRDS(paste0("code/results_exp5/",file))
+    all_data <- rbind(all_data, data)
+  }
+}
 
 
 # all_data %>%
@@ -73,6 +80,13 @@ for (file in dir("code/results_12_13")) {
 all_data$TrueATE <- ifelse(all_data$Exp==1,.5861,
                            ifelse(all_data$Exp==2, .32346, .5))
 
+
+all_data %>%
+  dplyr::mutate(across(-c(1,2), ~  . - TrueATE)) %>%
+  dplyr::mutate(across(-c(1,2), ~  . **2)) %>%
+  dplyr::select(-TrueATE) %>%
+  group_by(N,Exp) %>%
+  summarise(across(everything(), list(mean))) -> mse_table
 
 all_data %>%
   dplyr::filter(!is.na) %>%
