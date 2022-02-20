@@ -82,7 +82,6 @@ for (i in 1:nrow(rmse_table)) {
     scale_linetype_manual(values = linetypes)+
     scale_color_manual(values = colors)+
     xlim(0, 11000) +
-    ylim(0,.3)+
     geom_text_repel(
       aes(label = Estimator),
       data = end_values, color = end_values$Color,
