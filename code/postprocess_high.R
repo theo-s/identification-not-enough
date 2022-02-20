@@ -70,6 +70,8 @@ colnames(mse_table) <- c("N","K","P","Exp#","TMLE","CTMLE","NN Matching",
 
 library(xtable)
 
+saveRDS(mse_table, file = "code/high_mse.RDS")
+
 rmse_table <- mse_table
 rmse_table[,-c(1:4)] <- sqrt(rmse_table[,-c(1:4)])
 
