@@ -548,6 +548,15 @@ run_sim <- function(
 
   results <- list()
 
+  print("X: ")
+  print(X[1:20])
+  print("P Scores: ")
+  print(p_scores[1:20])
+  print("Treatment: ")
+  print(Tr[1:20])
+  print("Outcome: ")
+  print(Y[1:20])
+
 
 #  results[["tmle"]] <- try(tmle_sl(X_train = X,
 #                                    Y_train = Y,

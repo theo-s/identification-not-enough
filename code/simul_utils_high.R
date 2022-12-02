@@ -397,12 +397,26 @@ run_sim <- function(
   outcome <- mu_1(x = X, p = p, seed = seed)
   Y <- ifelse(Tr,outcome,0)
 
+  print("X: ")
+  print(X[1:20,])
+  print("P Scores: ")
+  print(p_scores[1:20])
+  print("Treatment: ")
+  print(Tr[1:20])
+  print("Outcome: ")
+  print(Y[1:20])
+
   results <- list()
 
   results[["tmle"]] <- try(tmle_sl(X_train = X,
                             Y_train = Y,
                             Tr_train = Tr,
                             p_scores = p_scores))
+
+  results[["tmle_c"]] <- try(tmle_c(X_train = X,
+                                   Y_train = Y,
+                                   Tr_train = Tr,
+                                   p_scores = p_scores))
 
   results[["nn_matching"]] <- try(nn_matching(X_train = X,
                                      Y_train = Y,

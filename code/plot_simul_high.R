@@ -9,6 +9,7 @@ library(ggpubr)
 
 
 mse_table <- readRDS(file = "code/high_mse.RDS")
+sd_table <- readRDS(file = "code/high_sd.RDS")
 
 rmse_table <- mse_table
 rmse_table[,-c(1:4)] <- sqrt(rmse_table[,-c(1:4)])
@@ -16,14 +17,17 @@ rmse_table[,-c(1:4)] <- sqrt(rmse_table[,-c(1:4)])
 rmse_table <- rmse_table[order(rmse_table$`Exp#`),]
 rmse_table <- rmse_table[order(rmse_table$`Exp#`, rmse_table$P, rmse_table$K, rmse_table$N),]
 
+
+# Remove results for TMLE + CTMLE now
+rmse_table <- rmse_table %>% dplyr::select(-TMLE, -CTMLE)
+sd_table <- sd_table %>% dplyr::select(-TMLE, -CTMLE)
+
 linetypes <- c("NN Matching" = "dotted",
                "LASSO" = "dotted",
                "DR (lasso)" = "dashed",
                "PS Matching" = "solid",
                "HT" = "solid",
-               "HT (lasso)" = "solid",
-               "TMLE" = "dashed",
-               "CTMLE" = "dashed"
+               "HT (lasso)" = "solid"
 )
 
 colors <- c("NN Matching" = "#88CCEE",
@@ -31,9 +35,7 @@ colors <- c("NN Matching" = "#88CCEE",
             "DR (lasso)" = "#999933",
             "HT (lasso)" = "#6699CC",
             "HT" = "#117733",
-            "PS Matching" = "#CC6677",
-            "TMLE" = "#661100",
-            "CTMLE" = "#661100"
+            "PS Matching" = "#CC6677"
 )
 
 col2 <- c("#88CCEE",
@@ -41,9 +43,7 @@ col2 <- c("#88CCEE",
           "#CC6677",
           "#AA4499",
           "#999933",
-          "#117733",
-          "#661100",
-          "#661100")
+          "#117733")
 
 
 for (i in 1:nrow(rmse_table)) {
@@ -62,23 +62,32 @@ for (i in 1:nrow(rmse_table)) {
     dplyr::rename(Estimator = variable) %>%
     dplyr::filter(N == 1e4) -> end_values
 
-  end_values$Color = c("#661100",
-                       "#661100",
-                       "#88CCEE",
+  end_values$Color = c("#88CCEE",
                        "#AA4499",
                        "#999933",
                        "#6699CC",
                        "#117733",
                        "#CC6677")
+  sd_table %>%
+    filter(K == k, P == p,`Exp#` == exp) %>%
+    ungroup() %>%
+    dplyr::select(-`K`, -`Exp#`,-P) %>%
+    melt(id = "N") %>%
+    dplyr::select(value) %>%
+    dplyr::rename(sd = value) -> sd_values
+
 
   rmse_table %>%
     filter(K == k, P == p,`Exp#` == exp) %>%
     ungroup() %>%
     dplyr::select(-`K`, -`Exp#`,-P) %>%
-    melt(id = "N") %>%
+    melt(id = "N") -> data_tab
+
+  data.frame(data_tab, sd = sd_values) %>%
     dplyr::rename(Estimator = variable) %>%
     ggplot(aes(x = N, y = value, color = Estimator, linetype = Estimator))+
     geom_line(show.legend = FALSE)+
+    geom_errorbar(aes(ymin=value-1.96*sd, ymax=value+1.96*sd), position=position_dodge(.9),show.legend = FALSE)+
     scale_linetype_manual(values = linetypes)+
     scale_color_manual(values = colors)+
     xlim(0, 11000) +

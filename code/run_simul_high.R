@@ -114,6 +114,7 @@ res <- data.frame(N = NA,
                   P = NA,
                   Exp = NA,
                   tmle = NA,
+                  tmle_c = NA,
                   nn_matching = NA,
                   lasso = NA,
                   dr_lasso = NA,
@@ -123,9 +124,13 @@ res <- data.frame(N = NA,
                   ht = NA,
                   ps_matching_true = NA)
 
-for (n in c(100,1000,10000)) {
-    for (k in c(round(.1*n), n, 10*n)) {
-      for (p in c(.1,.5,.9)) {
+#   for (p in c(.1)) {
+# for (k in c(100)) {
+for (p in c(.1,.5,.9)) {
+  for (k in c(100, 1000)) {
+    for (n in c(100,1000,10000)) {
+
+
 
         experiment_1 <- run_sim(p_score = ps,
                                 mu_1 = linear,
@@ -140,6 +145,7 @@ for (n in c(100,1000,10000)) {
                             p,
                             1,
                             experiment_1$tmle,
+                            experiment_1$tmle_c,
                             experiment_1$nn_matching,
                             experiment_1$lasso,
                             experiment_1$dr_lasso,
@@ -162,6 +168,7 @@ for (n in c(100,1000,10000)) {
                             p,
                             2,
                             experiment_2$tmle,
+                            experiment_2$tmle_c,
                             experiment_2$nn_matching,
                             experiment_2$lasso,
                             experiment_2$dr_lasso,
@@ -184,6 +191,7 @@ for (n in c(100,1000,10000)) {
                             p,
                             3,
                             experiment_3$tmle,
+                            experiment_3$tmle_c,
                             experiment_3$nn_matching,
                             experiment_3$lasso,
                             experiment_3$dr_lasso,
@@ -198,7 +206,7 @@ for (n in c(100,1000,10000)) {
   }
 
 
-filename <- paste0("code/results_high/res_",seed,".RDS")
+filename <- paste0("code/results_3_26/res_",seed,".RDS")
 saveRDS(res[-1,], filename)
 
 

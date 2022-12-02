@@ -25,7 +25,8 @@ if (!interactive()){
 # truncated p score
 linear_ps <- function(x) {
   probs <-  .5*x + .1
-  probs <-  min(max(probs,.01), .99)
+  probs <-  ifelse(probs > .99, .99,
+                   ifelse( probs < .01, .01, probs))
 
   logit <- function(x){return(exp(x)/(1+exp(x)))}
   return(sapply(probs, logit))
@@ -34,7 +35,8 @@ linear_ps <- function(x) {
 # Linear potential outcome, true ATE = .5861
 linear <- function(x) {
   probs <-  .5*x + .1
-  probs <-  min(max(probs,.01), .99)
+  probs <-  ifelse(probs > .99, .99,
+                   ifelse( probs < .01, .01, probs))
 
   logit <- function(x){return(exp(x)/(1+exp(x)))}
   probs <- sapply(probs, logit)
@@ -71,6 +73,7 @@ nonlinear_ps <- function(x) {
   return(probs)
 }
 
+# True ATE = .5
 # Highly nonlinear potential outcome, with many local jumps and # bins >> n. True ATE = .5
 nonlinear <- function(x) {
   # For now we keep the number of bins to be 100 X N depending on whatever N is

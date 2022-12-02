@@ -72,10 +72,11 @@ library(xtable)
 
 saveRDS(mse_table, file = "code/high_mse.RDS")
 
+mse_table <- readRDS(file = "code/high_mse.RDS")
 rmse_table <- mse_table
 rmse_table[,-c(1:4)] <- sqrt(rmse_table[,-c(1:4)])
 
 rmse_table <- rmse_table[order(rmse_table$`Exp#`),]
 rmse_table <- rmse_table[order(rmse_table$`Exp#`, rmse_table$P, rmse_table$K, rmse_table$N),]
 
-xtable(rmse_table, digits = 4, caption = "Results for the RMSE in high dimensional simulations")
+xtable(rmse_table %>% dplyr::select(-TMLE,-CTMLE), digits = 4, caption = "Results for the RMSE in high dimensional simulations")

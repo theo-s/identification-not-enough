@@ -7,18 +7,24 @@ library(ggrepel)
 library(cowplot)
 library(ggpubr)
 
-plot_type = "trunc" #"trunc"
+plot_type = "bias" #"trunc"
 
 if (plot_type == "mae") {
   in_name = "code/high_mae.RDS"
 } else if (plot_type == "trunc"){
   in_name = "code/high_mse_truncated.RDS"
+} else if (plot_type == "se") {
+  in_name = "code/high_se.RDS"
+} else if (plot_type == "bias") {
+  in_name = "code/high_bias.RDS"
 }
 
 mse_table <- readRDS(file = in_name)
 rmse_table <- mse_table
 if (plot_type == "trunc") {
   rmse_table[,-c(1:4)] <- sqrt(rmse_table[,-c(1:4)])
+} else if (plot_type == "bias") {
+  rmse_table[,-c(1:4)] <- abs(rmse_table[,-c(1:4)])
 }
 
 rmse_table <- rmse_table[order(rmse_table$`Exp#`),]
@@ -66,6 +72,10 @@ for (i in 1:nrow(rmse_table)) {
     ylabel = "Truncated RMSE when estimating ATE"
   } else if (plot_type == "mae") {
     ylabel = "MAE when estimating ATE"
+  } else if (plot_type == "bias") {
+    ylabel = "|Bias| when estimating ATE"
+  } else if (plot_type == "se") {
+    ylabel = "Standard Error when estimating ATE"
   }
 
   rmse_table %>%

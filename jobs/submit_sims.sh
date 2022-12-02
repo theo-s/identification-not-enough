@@ -3,7 +3,7 @@
 #SBATCH --job-name=identification_not_enough_sims
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=3
-#SBATCH --array=1-100
+#SBATCH --array=1-500
 #SBATCH --time=3-00:00:00
 #SBATCH --mail=theo_s@berkeley.edu
 

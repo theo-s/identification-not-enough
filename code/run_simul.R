@@ -22,7 +22,8 @@ if (!interactive()){
 # truncated p score
 linear_ps <- function(x) {
   probs <-  .5*x + .1
-  probs <-  min(max(probs,.01), .99)
+  probs <-  ifelse(probs > .99, .99,
+                   ifelse( probs < .01, .01, probs))
 
   logit <- function(x){return(exp(x)/(1+exp(x)))}
   return(sapply(probs, logit))
@@ -31,7 +32,8 @@ linear_ps <- function(x) {
 # Linear potential outcome, true ATE = .5861
 linear <- function(x) {
   probs <-  .5*x + .1
-  probs <-  min(max(probs,.01), .99)
+  probs <-  ifelse(probs > .99, .99,
+                   ifelse( probs < .01, .01, probs))
 
   logit <- function(x){return(exp(x)/(1+exp(x)))}
   probs <- sapply(probs, logit)
