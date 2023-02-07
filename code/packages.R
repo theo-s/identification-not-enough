@@ -1,3 +1,1 @@
-install.packages(pkgs = c("tmle"))
-
-devtools::install_github("tlverse/hal9001")
+install.packages(pkgs = c("iWeigReg","Rforestry","ranger","caret"))
