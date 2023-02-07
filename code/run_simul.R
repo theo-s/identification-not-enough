@@ -81,125 +81,53 @@ nonlinear <- function(x) {
 }
 
 # Run a sim of each DGP -------------------------------------------------------
-
 res <- data.frame(N = NA,
                   Exp = NA,
-                  tmle= NA,
-                  tmle_c= NA,
-                  tmle_hal= NA,
-                  dr_logit= NA,
-                  cross_fit= NA,
-                  dr_RF_Pscore_CF= NA,
-                  dr_RF_Pscore= NA,
-                  dr_noCF= NA,
-                  ht= NA,
-                  adjusted_ht= NA,
-                  loop_rf= NA,
-                  nn1= NA,
-                  ps1= NA,
-                  ps_rf1= NA,
-                  ps_logit1= NA,
-                  rf= NA,
-                  lr= NA
-                  )
+                  nn_matching = NA,
+                  logistic = NA,
+                  rf = NA,
+                  dr_logit = NA,
+                  dr_rf = NA,
+                  dr_rf_cf = NA,
+                  ht = NA,
+                  loop_rf = NA,
+                  ps_matching_true = NA,
+                  ht_rf_cf = NA,
+                  ht_rf = NA)
 
-# res <- data.frame(N = NA,
-#                   Exp = NA,
-#                   dr_logit = NA,
-#                   dr_RF_Pscore_CF = NA,
-#                   dr_RF_Pscore = NA,
-#                   dr_noCF = NA,
-#                   cross_fit = NA)
+for (n in c(100,1e4,1e5,1e6)) {
+  for (experiment_i in 1:3) {
+    print(paste0("Running experiment ", experiment_i))
 
-res <- data.frame(N = NA,
-                  Exp = NA,
-                  #tmle = NA,
-                  tmle_c = NA)
+    current.args = list()
+    current.args[["n"]] <- n
+    current.args[["seed"]] <- seed
 
-for (n in c(100, 1e6)) {
-  experiment_1 <- run_sim(p_score = linear_ps,
-                          mu_1 = linear,
-                          n=n,
-                          seed=seed)
+    # Get the right DGP
+    if (experiment_i == 1) {
+      current.args[["p_score"]] <- linear_ps
+      current.args[["mu_1"]] <- linear
+    } else if (experiment_i == 2) {
+      current.args[["p_score"]] <- smooth_ps
+      current.args[["mu_1"]] <- smooth
+    } else if (experiment_i == 3) {
+      current.args[["p_score"]] <- nonlinear_ps
+      current.args[["mu_1"]] <- nonlinear
+    } else {
+      stop(paste0("Not supported experiment id",experiment_i))
+    }
 
-  res <- rbind(res, c(n,
-                      1,
-                      experiment_1$tmle,
-                      experiment_1$tmle_c,
-                      experiment_1$tmle_hal,
-                      experiment_1$dr_logit,
-                      experiment_1$cross_fit,
-                      experiment_1$dr_RF_Pscore_CF,
-                      experiment_1$dr_RF_Pscore,
-                      experiment_1$dr_noCF,
-                      experiment_1$ht,
-                      experiment_1$adjusted_ht,
-                      experiment_1$loop_rf,
-                      experiment_1$nn1,
-                      experiment_1$ps1,
-                      experiment_1$ps_rf1,
-                      experiment_1$ps_logit1,
-                      experiment_1$rf,
-                      experiment_1$lr
-                      ))
-  print(res)
+    experiment <- do.call(what = run_sim,
+                          args = current.args)
 
-  experiment_2 <- run_sim(p_score = smooth_ps,
-                          mu_1 = smooth,
-                          n=n,
-                          seed=seed)
+    res <- rbind(res, c(n,1, sapply(1:length(experiment),
+                                    function(idx){return(experiment[[names(res)[2+idx]]])})))
 
-  res <- rbind(res, c(n,
-                      2,
-                      experiment_2$tmle,
-                      experiment_2$tmle_c,
-                      experiment_2$tmle_hal,
-                      experiment_2$dr_logit,
-                      experiment_2$cross_fit,
-                      experiment_2$dr_RF_Pscore_CF,
-                      experiment_2$dr_RF_Pscore,
-                      experiment_2$dr_noCF,
-                      experiment_2$ht,
-                      experiment_2$adjusted_ht,
-                      experiment_2$loop_rf,
-                      experiment_2$nn1,
-                      experiment_2$ps1,
-                      experiment_2$ps_rf1,
-                      experiment_2$ps_logit1,
-                      experiment_2$rf,
-                      experiment_2$lr
-                      ))
-  print(res)
-
-  experiment_3 <- run_sim(p_score = nonlinear_ps,
-                          mu_1 = nonlinear,
-                          n=n,
-                          seed=seed)
-
-  res <- rbind(res, c(n,
-                      3,
-                      experiment_3$tmle,
-                      experiment_3$tmle_c,
-                      experiment_3$tmle_hal,
-                      experiment_3$dr_logit,
-                      experiment_3$cross_fit,
-                      experiment_3$dr_RF_Pscore_CF,
-                      experiment_3$dr_RF_Pscore,
-                      experiment_3$dr_noCF,
-                      experiment_3$ht,
-                      experiment_3$adjusted_ht,
-                      experiment_3$loop_rf,
-                      experiment_3$nn1,
-                      experiment_3$ps1,
-                      experiment_3$ps_rf1,
-                      experiment_3$ps_logit1,
-                      experiment_3$rf,
-                      experiment_3$lr
-                      ))
-  print(res)
+    print(res)
+  }
 }
 
-filename <- paste0("code/results_ultra/new_sim_res_",seed,".RDS")
+filename <- paste0("code/results_2-6-23/res_",seed,".RDS")
 saveRDS(res[-1,], filename)
 
 

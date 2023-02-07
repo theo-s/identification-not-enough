@@ -119,9 +119,9 @@ rmse_table %>%
   )+
   theme_bw()+
   theme(plot.title = element_text(hjust = 0.5))+
-  labs(y = "RMSE when estimating ATE", x = "Sample Size", title = "Experiment 1")
+  labs(y = "RMSE when estimating ATE", x = "Sample Size", title = "Experiment 1") -> p1
 
-ggsave("code/figures/ctmle_rmse_experiment1.pdf", height = 4, width = 4)
+ggsave(plot = p1, "code/figures/ctmle_rmse_experiment1.pdf", height = 4, width = 4)
 
 # Plot Experiment 2 ------------------------------------------------------------
 rmse_table %>%
@@ -176,9 +176,9 @@ rmse_table %>%
   )+
   theme_bw()+
   theme(plot.title = element_text(hjust = 0.5))+
-  labs(y = "RMSE when estimating ATE", x = "Sample Size", title = "Experiment 2")
+  labs(y = "RMSE when estimating ATE", x = "Sample Size", title = "Experiment 2") -> p2
 
-ggsave("code/figures/ctmle_rmse_experiment2.pdf", height = 4, width = 4)
+ggsave(plot = p2, "code/figures/ctmle_rmse_experiment2.pdf", height = 4, width = 4)
 
 
 # Plot Experiment 3 ------------------------------------------------------------
@@ -239,61 +239,59 @@ rmse_table %>%
         legend.key.height = unit(.6, 'cm'), #change legend key height
         legend.key.width = unit(.3, 'cm'),
         legend.key.size = unit(4.5, 'cm'))+
-  labs(y = "RMSE when estimating ATE", x = "Sample Size", title = "Experiment 3")
+  labs(y = "RMSE when estimating ATE", x = "Sample Size", title = "Experiment 3") -> p3
 
 
-ggsave("code/figures/ctmle_rmse_experiment3.pdf", height = 4, width = 4)
+ggsave(plot = p3, "code/figures/ctmle_rmse_experiment3.pdf", height = 4, width = 4)
 
 # Plot the legend ==============================================================
-# rmse_table %>%
-#   filter(Exp == 3) %>%
-#   dplyr::filter(N > 100) %>%
-#   dplyr::select(-adjusted_ht_1,-ps_rf1_1,-ps_logit1_1) %>%
-#   dplyr::select(-Exp, -X) %>%
-#   dplyr::select(N,nn1_1, lr_1,rf_1,dr_logit_1,dr_RF_Pscore_1,dr_RF_Pscore_CF_1,ht_1,loop_rf_1,ps1_1,cross_fit_1,dr_noCF_1) %>%
-#   melt(id = "N") %>%
-#   dplyr::rename(Estimator = variable) %>%
-#   dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
-#                                                        "ps1_1" = "PS Matching (True)",
-#                                                        "dr_RF_Pscore_1" = "DRRF",
-#                                                        "dr_RF_Pscore_CF_1" = "DRRF CF",
-#                                                        "dr_noCF_1" = "HT RF",
-#                                                        "lr_1" = "Logistic",
-#                                                        "rf_1" = "RF",
-#                                                        "loop_rf_1" = "LOO RF ",
-#                                                        "cross_fit_1" = "CF RF",
-#                                                        "dr_logit_1" = "DR Logit",
-#                                                        "ht_1" = "Horvitz-Thompson",
-#                                                        "tmle_1" ="TMLE SL",
-#                                                        "tmle_hal_1" = "TMLE HAL"))) %>%
-#   ggplot(aes(x = N, y = value, color = Estimator, linetype = Estimator))+
-#   geom_line(show.legend = TRUE, size = 2)+
-#   scale_linetype_manual(values = linetypes)+
-#   scale_color_manual(values = colors)+
-#   xlim(0, 110000) +
-#   ylim(0,.35)+
-#   geom_text_repel(
-#     aes(label = Estimator, color = Estimator),
-#     data = end_values, color = col2,
-#     size = 2, force = 3,arrow = arrow(length = unit(0.01, "npc")),
-#     direction = "both", nudge_x = 500, nudge_y = .05, point.padding = .52, max.overlaps = Inf
-#   )+
-#   theme_bw()+
-#   theme(plot.title = element_text(hjust = 0.5))+
-#   guides(colour = guide_legend(title.position = "top"))+
-#   theme(legend.position = "left",
-#         legend.key.height = unit(.6, 'cm'), #change legend key height
-#         legend.key.width = unit(3, 'cm'),
-#         legend.spacing.x = unit(.1, 'cm'),
-#         legend.spacing.y = unit(.02, 'cm'),
-#         legend.key.size = unit(8, 'cm'),
-#         legend.title.align = .5)+
-#   labs(y = "RMSE when estimating ATE", x = "Sample Size", title = "Experiment 3") -> p3
-#
-# legend <- cowplot::get_legend(p3)
-# as_ggplot(legend)
-#
-# ggsave("code/figures/legend.pdf", height = 3.5, width = 2.5)
+rmse_table %>%
+  filter(Exp == 3) %>%
+  dplyr::filter(N > 100) %>%
+  dplyr::select(-adjusted_ht_1,-ps_rf1_1,-ps_logit1_1) %>%
+  dplyr::select(-Exp, -X) %>%
+  dplyr::select(N,nn1_1, lr_1,rf_1,dr_logit_1,dr_RF_Pscore_1,dr_RF_Pscore_CF_1,ht_1,loop_rf_1,ps1_1,cross_fit_1,dr_noCF_1) %>%
+  melt(id = "N") %>%
+  dplyr::rename(Estimator = variable) %>%
+  dplyr::mutate(Estimator = plyr::revalue(Estimator, c("nn1_1" = "NN Matching",
+                                                       "ps1_1" = "PS Matching (True)",
+                                                       "dr_RF_Pscore_1" = "DRRF",
+                                                       "dr_RF_Pscore_CF_1" = "DRRF CF",
+                                                       "dr_noCF_1" = "HT RF",
+                                                       "lr_1" = "Logistic",
+                                                       "rf_1" = "RF",
+                                                       "loop_rf_1" = "LOO RF ",
+                                                       "cross_fit_1" = "CF RF",
+                                                       "dr_logit_1" = "DR Logit",
+                                                       "ht_1" = "Horvitz-Thompson"))) %>%
+  ggplot(aes(x = N, y = value, color = Estimator, linetype = Estimator))+
+  geom_line(show.legend = TRUE, size = 2)+
+  scale_linetype_manual(values = linetypes)+
+  scale_color_manual(values = colors)+
+  xlim(0, 110000) +
+  ylim(0,.35)+
+  geom_text_repel(
+    aes(label = Estimator, color = Estimator),
+    data = end_values, color = col2,
+    size = 2, force = 3,arrow = arrow(length = unit(0.01, "npc")),
+    direction = "both", nudge_x = 500, nudge_y = .05, point.padding = .52, max.overlaps = Inf
+  )+
+  theme_bw()+
+  theme(plot.title = element_text(hjust = 0.5))+
+  guides(colour = guide_legend(title.position = "top"))+
+  theme(legend.position = "left",
+        legend.key.height = unit(.6, 'cm'), #change legend key height
+        legend.key.width = unit(3, 'cm'),
+        legend.spacing.x = unit(.1, 'cm'),
+        legend.spacing.y = unit(.02, 'cm'),
+        legend.key.size = unit(8, 'cm'),
+        legend.title.align = .5)+
+  labs(y = "RMSE when estimating ATE", x = "Sample Size", title = "Experiment 3") -> p4
+
+legend <- cowplot::get_legend(p3)
+leg_plot <- as_ggplot(legend)
+
+ggsave(plot = leg_plot, "code/figures/legend.pdf", height = 3.5, width = 2.5)
 #
 #
 # library(kableExtra)
