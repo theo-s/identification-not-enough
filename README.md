@@ -1,4 +1,4 @@
-# Replication Code: Nonparametric identification is not enough, but randomized controlled trials are
+# Nonparametric identification is not enough, but randomized controlled trials are
 
 P. M. Aronow, James M. Robins, Theo Saarinen, Fredrik Sävje, Jasjeet Sekhon
 
