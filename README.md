@@ -1,60 +1,43 @@
 # Replication Code: Nonparametric identification is not enough, but randomized controlled trials are
 
-This repo contains the code to run several simulations from the paper *Nonparametric identification is not enough, but randomized controlled trials are*.
+P. M. Aronow, James M. Robins, Theo Saarinen, Fredrik Sävje, Jasjeet Sekhon
+
+This repo contains the code reproduce the simulations from *Nonparametric identification is not enough, but randomized controlled trials are*.
 [https://arxiv.org/abs/2108.11342](https://arxiv.org/abs/2108.11342).
 
-## Low Dimensional Simulations
+## Simulation Replication
 
-The code for running a single run of the low dimensional simulations can be found in `code/run_simul.R`. 
-In order to run this script with a single seed, one should run the R script as:
-```
-Rscript code/run_simul.R --s 99
-```
+The main script for running a set of simulations is the `inesims.R`. Given three
+command line arguments:
 
-In order to submit an array of jobs to a cluster using SLURM, using the list of seeds in `jobs/params.txt`,
-one should use the script:
+- `n`: the number of training data points
+- `DGP`: the data generating process to use (must be one of 1: logistic function, 2: sinusoidal function, or 3: adversarial binned DGP)
+- `nrounds`: the number of Monte Carlo replications to run
 
+Data will be generated according to the selected DGP and the bias and RMSE results from each estimator are calculated and stored in `res/`.
+For example, to get the results for the first DGP with `n=100,000` and `1000` Monte Carlo replications, one should run:
 ```
-sbatch jobs/submit_sims.sh
+Rscript inesims.R 1e5 1 1000
 ```
-Note that by default this runs 500 Monte Carlo replications so may have a fairly long run time.
-In order to create the plots after running the simulation, one should run (the resulting plots will be saved
-in `code/figures`/):
+The results will then be stored in `res/ine-100000-1-10000-[as.integer(Sys.time())].rds`
 
-```
-Rscript code/postprocess_simul.R
-Rscript code/plot_simul.R
-```
-The resulting figures will then be saved in `figures`.
 
-## High Dimensional Simulations
+## Plotting Results
 
-The setup for running the high dimensional simulations is very similar.
-One difference is that the coefficients for the DGPs will need to be generated before
-the simulations can be ran. 
-In order to do this, one needs to run:
+The `compile.R` script processes the results from `res/` and produces Figure 3 from the paper.
+Running the necessary combinations of training data points and data generating processes
+to produce the figure from the paper can be time consuming, so `cluster/` contains 
+the needed scripts to run the simulations on a cluster using the SLURM scheduler.
+For instance, to submit a job to SLURM that runs the first DGP with `n=100,000` using `1000` Monte Carlo replications,
+one should run:
 ```
-Rscript code/generate_coefs.R
+sbatch cluster/ine-large-1-100.sh
 ```
 
-The script for running a single run of the high dimensional simulations can be found in `code/run_simul_high.R`. 
-In order to run this script with a single seed, one should run the R script as:
-```
-Rscript code/run_simul_high.R --s 99
-```
 
-In order to submit an array of jobs to the cluster, using the list of seeds in `jobs/params.txt`,
-one should use the script:
 
-```
-sbatch jobs/submit_sims_high.sh
-```
 
-Note that by default this runs 500 Monte Carlo replications so may have a fairly long run time.
-In order to create the plots after running the simulation, one should run (the resulting plots will be saved
-in `code/figures`/):
 
-```
-Rscript code/postprocess_high.R
-Rscript code/plot_simul_high.R
-```
+
+
+
