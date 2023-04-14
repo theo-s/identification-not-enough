@@ -25,6 +25,14 @@ The results will then be stored in `res/ine-100000-1-10000-[as.integer(Sys.time(
 ## Plotting Results
 
 The `compile.R` script processes the results from `res/` and produces Figure 3 from the paper.
+For instance, one can run:
+```
+Rscript compile.R
+```
+Figure 3 from the paper will then be generated and saved to `figures/ine-rmse.pdf`.
+
+## Cluster Scripts
+
 Running the necessary combinations of training data points and data generating processes
 to produce the figure from the paper can be time consuming, so `cluster/` contains 
 the needed scripts to run the simulations on a cluster using the SLURM scheduler.
