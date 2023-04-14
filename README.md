@@ -19,7 +19,7 @@ For example, to get the results for the first DGP with `n=100,000` and `1000` Mo
 ```
 Rscript inesims.R 1e5 1 1000
 ```
-The results will then be stored in `res/ine-100000-1-10000-[as.integer(Sys.time())].rds`
+The results will then be stored in `res/ine-100000-1-10000-[as.integer(Sys.time())].rds`.
 
 
 ## Plotting Results
